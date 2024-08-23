@@ -1,0 +1,181 @@
+.work-experience {
+  background-color: #000;
+  color: #fff;
+  min-height: 100vh;
+  padding: 50px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+.work-experience h2 {
+  font-size: 3em;
+  text-align: center;
+  margin-bottom: 40px;
+  color: #fff;
+  font-weight: 300;
+}
+
+.experience-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 150px);
+}
+
+.experience-card {
+  width: 300px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  margin: 0 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.experience-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+}
+
+.card-content {
+  padding: 20px;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.experience-card img {
+  width: 100%;
+  height: 50%;
+  object-fit: cover;
+}
+
+.experience-card h3 {
+  font-size: 1.8em;
+  margin-bottom: 5px;
+  color: #fff;
+  font-weight: 400;
+}
+
+.experience-card .role {
+  font-size: 1.2em;
+  color: #999;
+  margin-bottom: 5px;
+}
+
+.experience-card .period {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.iphone-modal {
+  background: #fff;
+  width: 350px;
+  height: 700px;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), 0 0 30px rgba(255, 0, 255, 0.5), 0 0 40px rgba(255, 255, 0, 0.5);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.iphone-header {
+  height: 60px;
+  background: #000;
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.iphone-camera {
+  width: 60px;
+  height: 10px;
+  background: #333;
+  border-radius: 5px;
+}
+
+.modal-content {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #000;
+  width: 100%;
+}
+
+.modal-content h3 {
+  font-size: 1.8em;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.modal-content .role {
+  font-size: 1.4em;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.modal-content .period {
+  font-size: 1em;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+.modal-content .details {
+  font-size: 1.1em;
+  line-height: 1.6;
+  color: #222;
+  margin-bottom: 20px;
+  animation: textPop 0.5s ease-out;
+}
+
+.modal-content button {
+  background: linear-gradient(45deg, #ff0047, #2b2bff);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1em;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: flex-end;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content button:hover {
+  background: linear-gradient(45deg, #2b2bff, #ff0047);
+}
+
+@keyframes textPop {
+  0% {
+      transform: scale(0.8);
+      opacity: 0;
+  }
+  100% {
+      transform: scale(1);
+      opacity: 1;
+  }
+}

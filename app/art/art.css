@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;700&display=swap');
+
+body {
+  font-family: 'Raleway', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #000000;
+}
+
+.art-portfolio {
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #000000, #1a1a1a);
+  color: white;
+  padding: 2rem;
+}
+
+.portfolio-title {
+  font-size: 3rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.quote {
+  text-align: center;
+  font-style: italic;
+  font-size: 1.2rem;
+  margin-bottom: 3rem;
+  color: #cccccc;
+}
+
+.artworks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.artwork-item {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.artwork-item.right {
+  flex-direction: row-reverse;
+}
+
+.artwork-item.center {
+  justify-content: center;
+  text-align: center;
+}
+
+.artwork-image {
+  flex: 1;
+  max-width: 500px;
+}
+
+.artwork-image img {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.artwork-image img:hover {
+  transform: scale(1.05);
+}
+
+.artwork-details {
+  flex: 1;
+}
+
+.artwork-details h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #f0f0f0;
+}
+
+.artwork-details p {
+  color: #cccccc;
+  line-height: 1.6;
+}
+
+.photography-section {
+  margin-top: 4rem;
+  text-align: center;
+}
+
+.photography-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #f0f0f0;
+}
+
+.cheesy-line {
+  font-style: italic;
+  margin-bottom: 2rem;
+  color: #cccccc;
+}
+
+.photo-slider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.photo-container {
+  width: 60%;
+}
+
+.photo-container img {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.photo-container img:hover {
+  transform: scale(1.05);
+}
+
+.photo-caption {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #cccccc;
+}
+
+.slider-button {
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.slider-button:hover {
+  transform: scale(1.2);
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+.btn-neon {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  color: #fff;
+  background: rgba(255, 0, 255, 0.1);
+  border: 2px solid rgba(255, 0, 255, 0.5);
+  border-radius: 30px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.btn-neon:hover {
+  background: rgba(255, 0, 255, 0.2);
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+}
+
+.btn-neon::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(45deg);
+  z-index: -1;
+  transition: all 0.3s ease;
+}
+
+.btn-neon:hover::before {
+  left: 100%;
+}
+
+.shadow-neon {
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.shadow-neon:hover {
+  box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+}
+
+@keyframes neonPulse {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 0, 255, 0.5), 0 0 10px rgba(255, 0, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.8), 0 0 30px rgba(255, 0, 255, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(255, 0, 255, 0.5), 0 0 10px rgba(255, 0, 255, 0.5);
+  }
+}
+
+.neon-pulse {
+  animation: neonPulse 2s infinite;
+}
+
+@media (max-width: 768px) {
+  .artwork-item {
+    flex-direction: column;
+  }
+
+  .artwork-item.right {
+    flex-direction: column;
+  }
+
+  .artwork-image, .artwork-details {
+    max-width: 100%;
+  }
+
+  .photo-container {
+    width: 80%;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
