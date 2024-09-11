@@ -3,16 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 30, 30, 30;
+  --accent-color: 0, 255, 255; /* Neon cyan accent */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background-end-rgb: 10, 10, 10;
+    --accent-color: 255, 0, 255; /* Neon magenta accent */
   }
 }
 
@@ -20,15 +22,47 @@ body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
-      transparent,
+      rgba(var(--background-end-rgb), 0.8),
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 2px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(var(--background-start-rgb), 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--accent-color), 0.7);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--accent-color), 0.9);
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
-}
+  
+  .neon-text {
+    color: rgb(var(--accent-color));
+    text-shadow: 0 0 5px rgba(var(--accent-color), 0.7), 0 0 10px rgba(var(--accent-color), 0.5);
+  }
 
+  .neon-bg {
+    background: rgba(var(--accent-color), 0.2);
+    box-shadow: 0 0 10px rgba(var(--accent-color), 0.5);
+  }
+}

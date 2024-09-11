@@ -1,203 +1,139 @@
-import React, { useState, useEffect } from 'react';
-import { motion, useAnimation } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
-
+'use client';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import SketchbookModal from '../components/SketchBookModal/SketchBookModal';
 import './art.css';
 
-const ArtPortfolio = () => {
-  const [quote, setQuote] = useState('');
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+// Define types for Artwork and Photo objects
+interface Artwork {
+  id: number;
+  title: string;
+  image: string;
+  description: string;
+}
 
-  const artworks = [
-    { id: 1, title: 'Abstract Harmony', image: 'https://assets.lummi.ai/assets/QmRiyUh7STc4NBoJpRkTUBUPYoy5wgRm54Q8AFPexx1vRR?auto=format&w=1500', description: 'A vibrant exploration of color and form, pushing the boundaries of perception.' },
-    { id: 2, title: 'Urban Reflections', image: 'https://assets.lummi.ai/assets/QmRiyUh7STc4NBoJpRkTUBUPYoy5wgRm54Q8AFPexx1vRR?auto=format&w=1500', description: 'Cityscape captured in a moment of tranquility, where light dances on glass and steel.' },
-    { id: 3, title: 'Nature\'s Whisper', image: 'https://assets.lummi.ai/assets/QmRiyUh7STc4NBoJpRkTUBUPYoy5wgRm54Q8AFPexx1vRR?auto=format&w=1500', description: 'Delicate flora rendered in soft pastels, inviting viewers into a world of serenity.' },
-    { id: 4, title: 'Digital Dreams', image: 'https://assets.lummi.ai/assets/QmRiyUh7STc4NBoJpRkTUBUPYoy5wgRm54Q8AFPexx1vRR?auto=format&w=1500', description: 'A fusion of technology and imagination, where pixels become poetry.' },
-  ];
+interface Photo {
+  id: number;
+  image: string;
+  caption: string;
+}
 
-  const photos = [
-    { id: 1, image: 'https://assets.lummi.ai/assets/QmRiyUh7STc4NBoJpRkTUBUPYoy5wgRm54Q8AFPexx1vRR?auto=format&w=1500', caption: 'Capturing moments, one click at a time' },
-    { id: 2, image: 'https://assets.lummi.ai/assets/QmRiyUh7STc4NBoJpRkTUBUPYoy5wgRm54Q8AFPexx1vRR?auto=format&w=1500', caption: 'Through my lens, the world becomes art' },
-    { id: 3, image: 'https://assets.lummi.ai/assets/QmRiyUh7STc4NBoJpRkTUBUPYoy5wgRm54Q8AFPexx1vRR?auto=format&w=1500', caption: 'Every photo tells a story waiting to be heard' },
-  ];
-
-  const quotes = [
-    "Art is the lie that enables us to realize the truth.",
-    "The purpose of art is washing the dust of daily life off our souls.",
-    "Every artist dips his brush in his own soul, and paints his own nature into his pictures.",
-    "Art enables us to find ourselves and lose ourselves at the same time."
-  ];
+const ArtPortfolio: React.FC = () => {
+  // Allow null or an Artwork object
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number>(0);
+  const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
-    }, 5000);
-    return () => clearInterval(interval);
+    document.documentElement.style.scrollBehavior = 'smooth';
+    return () => {
+      document.documentElement.style.scrollBehavior = 'auto';
+    };
   }, []);
 
-  const nextPhoto = () => {
+  const artworks: Artwork[] = useMemo(() => [
+    { id: 1, title: 'Abstract Harmony', image: '/artwork1.jpeg', description: 'A vibrant exploration of color and form, pushing the boundaries of perception. Intricate details reveal hidden narratives within the chaos of hues.' },
+    { id: 2, title: 'Urban Reflections', image: '/artwork2.jpg', description: 'Cityscape captured in a moment of tranquility, where light dances on glass and steel. Each window tells a story, each reflection a glimpse into urban life.' },
+    { id: 3, title: 'Nature\'s Whisper', image: '/artwork3.jpg', description: 'Delicate flora rendered in soft pastels, inviting viewers into a world of serenity. Subtle textures and intricate patterns mimic nature\'s complexity.' },
+    { id: 4, title: 'Digital Dreams', image: '/artwork4.jpg', description: 'A fusion of technology and imagination, where pixels become poetry. Each digital brushstroke carries meaning, creating a tapestry of modern expression.' },
+  ], []);
+
+  const photos: Photo[] = useMemo(() => [
+    { id: 1, image: '/photo1.jpg', caption: 'A moment frozen in time, telling stories through light and shadow.' },
+    { id: 2, image: '/photo1.jpeg', caption: 'Every frame captures a unique perspective, revealing hidden beauty.' },
+    { id: 3, image: '/photo3.jpeg', caption: 'In each click, a new world unfolds, inviting exploration and wonder.' },
+    { id: 4, image: '/photo4.jpeg', caption: 'Photography: where reality meets art in perfect harmony.' },
+    { id: 5, image: '/photo5.jpeg', caption: 'Through the lens, ordinary moments become extraordinary memories.' },
+    { id: 6, image: '/photo6.jpeg', caption: 'Capturing life\'s fleeting instants, one shutter release at a time.' },
+  ], []);
+
+  const nextPhoto = useCallback(() => {
     setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length);
-  };
+  }, [photos.length]);
 
-  const prevPhoto = () => {
+  const prevPhoto = useCallback(() => {
     setCurrentPhotoIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length);
-  };
+  }, [photos.length]);
 
-  const ArtworkItem = ({ artwork, index }) => {
-    const controls = useAnimation();
-    const [ref, inView] = useInView({
-      triggerOnce: true,
-      threshold: 0.2,
-    });
-
-    useEffect(() => {
-      if (inView) {
-        controls.start('visible');
-      }
-    }, [controls, inView]);
-
-    const variants = {
-      hidden: { opacity: 0, y: 50 },
-      visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: index * 0.2 } },
-    };
-
-    return (
-      <motion.div
-        ref={ref}
-        animate={controls}
-        initial="hidden"
-        variants={variants}
-        className={`artwork-item ${index === 2 ? 'center' : index % 2 === 0 ? 'left' : 'right'}`}
-      >
-        <div className="artwork-image">
-          <motion.img 
-            src={artwork.image} 
-            alt={artwork.title} 
-            className="shadow-neon" 
-            whileHover={{ scale: 1.05, rotate: 2 }}
-            whileTap={{ scale: 0.95 }}
-          />
-        </div>
-        <div className="artwork-details">
-          <motion.h2 
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {artwork.title}
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            {artwork.description}
-          </motion.p>
-        </div>
-      </motion.div>
-    );
-  };
+  const AnimatedText = ({ text, className }: { text: string, className?: string }) => (
+    <h1 className={className}>
+      {text.split('').map((char, index) => (
+        <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>{char}</span>
+      ))}
+    </h1>
+  );
 
   return (
     <div className="art-portfolio">
-      <motion.h1
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="portfolio-title"
-      >
-        My Artistic Journey
-      </motion.h1>
+      <AnimatedText text="My SketchBook" className="portfolio-title animated-text" />
       
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 0.5 }}
-        className="quote"
-      >
-        {quote}
-      </motion.div>
-
       <div className="artworks-container">
-        {artworks.map((artwork, index) => (
-          <ArtworkItem key={artwork.id} artwork={artwork} index={index} />
+        {artworks.map((artwork) => (
+          <div
+            key={artwork.id}
+            className="artwork-item animated-card"
+            onClick={() => setSelectedArtwork(artwork)}
+          >
+            <div className="artwork-image">
+              <LazyLoadImage
+                src={artwork.image}
+                alt={artwork.title}
+                effect="blur"
+                width="100%"
+                height="100%"
+              />
+            </div>
+            <div className="artwork-details">
+              <h2>{artwork.title}</h2>
+              <p>{artwork.description}</p>
+            </div>
+          </div>
         ))}
       </div>
 
       <div className="photography-section">
-        <motion.h2
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          My Photography
-        </motion.h2>
-        <motion.p 
-          className="cheesy-line"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          I don't just paint with brushes, I paint with light and moments.
-        </motion.p>
+        <AnimatedText text="My Photography" className="photography-title animated-text" />
+        <p className="photo-quote">Exploring the world through my lens, one frame at a time.</p>
         <div className="photo-slider">
           <button onClick={prevPhoto} className="slider-button">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ChevronLeft size={40} />
           </button>
-          <motion.div 
-            className="photo-container"
-            key={currentPhotoIndex}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.5 }}
+          <div 
+            className="photo-container animated-card"
+            onClick={() => setSelectedPhoto(photos[currentPhotoIndex])}
           >
-            <motion.img 
-              src={photos[currentPhotoIndex].image} 
-              alt="Photography" 
-              className="shadow-neon"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <LazyLoadImage
+              src={photos[currentPhotoIndex].image}
+              alt="Photography"
+              effect="blur"
+              width="100%"
+              height="100%"
             />
-            <motion.p 
-              className="photo-caption"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {photos[currentPhotoIndex].caption}
-            </motion.p>
-          </motion.div>
+            <p className="photo-caption">{photos[currentPhotoIndex].caption}</p>
+          </div>
           <button onClick={nextPhoto} className="slider-button">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ChevronRight size={40} />
           </button>
         </div>
       </div>
 
-      <div className="cta-buttons">
-        <motion.a 
-          href="#" 
-          className="btn-neon"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          View More Art
-        </motion.a>
-        <motion.a 
-          href="#" 
-          className="btn-neon"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          Connect on Instagram
-        </motion.a>
-      </div>
+      {selectedArtwork && (
+        <SketchbookModal
+          artwork={selectedArtwork}
+          onClose={() => setSelectedArtwork(null)}
+        />
+      )}
+
+      {selectedPhoto && (
+        <SketchbookModal
+          artwork={selectedPhoto}
+          onClose={() => setSelectedPhoto(null)}
+        />
+      )}
     </div>
   );
 };
 
-export default ArtPortfolio;
+export default React.memo(ArtPortfolio);

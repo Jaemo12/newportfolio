@@ -1,8 +1,7 @@
 'use client';
 // pages/index.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import Image from 'next/image';
 import Hero from './hero/page';
 import Navbar from './navbar/page';
 import AboutSection from './about/page';
@@ -12,66 +11,44 @@ import BlurringText from './blur/page';
 import SocialsPage from './social/page';
 import ContactMePage from './contact/page';
 import ArtPortfolio from './art/page';
+import Footer from './components/footer/footer';
+import LoadingPage from './LoadingPage/page';
 
 const HomePage: React.FC = () => {
-  const aboutRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.1
-    };
+    // Simulate loading time
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
 
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('fade-in');
-        } else {
-          entry.target.classList.remove('fade-in');
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-    if (aboutRef.current) {
-      observer.observe(aboutRef.current);
-    }
-
-    return () => {
-      if (aboutRef.current) {
-        observer.unobserve(aboutRef.current);
-      }
-    };
+    return () => clearTimeout(timer);
   }, []);
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
 
   return (
     <>
       <Head>
         <title>Your Name | Portfolio</title>
         <meta name="description" content="A showcase of my work and skills" />
-        <link rel="stylesheet" href="/styles/AboutSection.css" />
       </Head>
 
-      <main>
-        <header>
-          <Hero />
-        </header>
-
+      <main className="bg-black text-white">
         <Navbar />
-
-        
-          <AboutSection />
-          <BlurringText />
+        <Hero />
+        <AboutSection />
+        <BlurringText />
         <WorkExperience />
-        
         <Projects />
         <ArtPortfolio />
         <SocialsPage />
         <ContactMePage />
-
-        </main>
+        <Footer />
+      </main>
     </>
   );
 };
