@@ -104,13 +104,13 @@ const AboutSection: React.FC = () => {
           >
             <TypeAnimation
               sequence={[
-                "I'm a Web Developer",
+                "Im a Web Developer",
                 1000,
-                "I'm a UX Designer",
+                "Im a UX Designer",
                 1000,
-                "I'm a Problem Solver",
+                "Im a Problem Solver",
                 1000,
-                "I'm a Creator",
+                "Im a Creator",
                 1000,
               ]}
               wrapper="h2"
@@ -167,7 +167,7 @@ const AboutSection: React.FC = () => {
             animate={isJourneyInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Hi there! I'm a software developer who loves turning caffeine into code.  With two years of experience and a Master's in Computer Science, I'm all about building elegant solutions.  But hey, it's not all about the tech.  I hail from a small mountain town in India (Pithoragarh, represent!), and I'm also a bit of an art enthusiast.  Currently soaking up the Texas sun in Dallas, and always open to exciting new projects!
+            Hi there! Im a software developer who loves turning caffeine into code.  With two years of experience and a Masters in Computer Science, Im all about building elegant solutions.  But hey, it is not all about the tech.  I hail from a small mountain town in India (Pithoragarh, represent!), and Im also a bit of an art enthusiast.  Currently soaking up the Texas sun in Dallas, and always open to exciting new projects!
           </motion.p>
         </div>
       </motion.div>
