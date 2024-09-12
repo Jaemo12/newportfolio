@@ -23,61 +23,63 @@ interface Project {
 
 const projects: Project[] = [
   {
-    title: "NexusAI",
-    description: "An advanced AI-powered platform that revolutionizes natural language processing and generation. NexusAI leverages cutting-edge machine learning algorithms to provide human-like text interactions, content creation, and data analysis.",
-    image: "https://assets.lummi.ai/assets/QmWLgttKs6fgnxAUrxe4sznNg9vTdBWimTw45SdCiACMzW?auto=format&w=1500",
-    technologies: ["Python", "TensorFlow", "React", "Node.js", "MongoDB"],
-    link: "https://nexusai.tech",
-    github: "https://github.com/yourusername/nexusai",
+    title: "AI DIARY",
+    description: "An AI-powered journaling app designed to foster self-reflection and emotional well-being. MindScape uses advanced natural language processing to analyze journal entries, offering personalized insights and support to users on their mental health journeys.",
+    image: "/aidiary.png", 
+    technologies: ["React.js", "Firebase", "Tailwind CSS", "Gemini API", "TypeScript","Artificial Intelligence"],
+    link: "https://journalapp-cyan.vercel.app/", 
+    github: "https://github.com/yourusername/mindscape",
     features: [
-      "State-of-the-art language models",
-      "Real-time text generation and analysis",
-      "Multi-language support with 50+ languages",
-      "Customizable AI training pipelines"
+      "AI-driven mood analysis and personalized insights",
+      "Secure and private journaling environment",
+      "Interactive chatbot for emotional support and reflection",
+      "Track mood trends and identify potential triggers"
     ],
     stats: {
-      users: "100k+",
-      accuracy: "99.7%",
-      languages: "50+"
+      reviews: "50",
+      satisfactionRate: "92%",
+      insightsGenerated: "200+" 
     }
   },
   {
-    title: "EcoTrack",
-    description: "A comprehensive environmental monitoring system that utilizes IoT sensors and big data analytics to track and analyze ecological parameters in real-time. EcoTrack empowers researchers, governments, and corporations to make data-driven decisions for sustainability.",
-    image: "https://assets.lummi.ai/assets/QmbaVqi9crSVC95dcGG3x4g7zmiFy2jdoNseaa1REHYedN?auto=format&w=1500",
-    technologies: ["IoT", "AWS", "React Native", "Python", "TensorFlow"],
-    link: "https://ecotrack.earth",
-    github: "https://github.com/yourusername/ecotrack",
+    title: "ReviewFlix",
+    description: "A movie recommendation platform that leverages sentiment analysis and emotional intelligence to provide personalized suggestions based on user preferences and the emotional tone of TMDB reviews.",
+    image: "reviewflix.png", 
+    technologies: ["Next.js", "Framer Motion", "Python", "Sentiment Analysis", "Emotional Intelligence","MongoDB", "JavaScript/TypeScript"],
+    link: "https://www.reviewflix.com", 
+    github: "https://github.com/yourusername/reviewflix", 
     features: [
-      "Global network of IoT environmental sensors",
-      "Real-time data visualization and analytics",
-      "Predictive modeling for environmental trends",
-      "Mobile app for citizen science contributions"
+      "Personalized movie recommendations",
+      "Emotion-based filtering",
+      "Deep dive into review sentiment",
+      "User-friendly interface with smooth animations"
     ],
     stats: {
-      sensors: "1M+",
-      dataPoints: "1B+/day",
-      countries: "50+"
+      users: "50+",
+      moviesAnalyzed: "100K+",
+      positiveRecommendations: "90%" 
     }
   },
   {
-    title: "CryptoNova",
-    description: "A next-generation cryptocurrency trading platform that combines advanced trading tools with social features. CryptoNova uses AI to provide personalized trading insights and risk management strategies for both novice and expert traders.",
-    image: "https://assets.lummi.ai/assets/QmRiyUh7STc4NBoJpRkTUBUPYoy5wgRm54Q8AFPexx1vRR?auto=format&w=1500",
-    technologies: ["React", "Node.js", "WebSocket", "MongoDB", "TensorFlow"],
-    link: "https://cryptonova.finance",
-    github: "https://github.com/yourusername/cryptonova",
+    title: "RecipeGenius",
+    description: "A culinary companion that uses AI to generate unique and delicious recipes based on your dietary preferences, available ingredients, and desired cuisine style. Built with Next.js, Firebase, and the Gemini API, RecipeGenius transforms meal planning from a chore into a delightful experience.",
+    image: "/recipe.png", 
+    technologies: ["Next.js", "Firebase", "Gemini API", "JavaScript/TypeScript"], 
+    link: "https://recipe-generator-opal.vercel.app/",
+    github: "https://github.com/yourusername/recipegenius", // Replace with your actual GitHub repo
     features: [
-      "AI-powered trading signals and portfolio management",
-      "Real-time market data and social sentiment analysis",
-      "Secure multi-currency wallet with hardware key support",
-      "Community-driven education and mentorship programs"
+        "AI-powered recipe generation tailored to your needs",
+        "Intuitive search and filtering options",
+        "Personalized recipe recommendations",
+        "Step-by-step cooking instructions with images",
+        "Save and share your favorite recipes"
     ],
+    
     stats: {
-      tradingVolume: "$500M+/day",
-      users: "2M+",
-      cryptos: "100+"
-    }
+        recipesGenerated: "10,000+",
+        users: "50+",
+        averageRating: "4.5/5"
+     }
   }
 ];
 
@@ -201,7 +203,7 @@ const ProjectCard: React.FC<{ project: Project; index: number; controls: any }> 
     >
       <motion.div 
         className="w-full lg:w-1/3 relative z-10"
-        whileHover={{ scale: 1.05, rotateY: 5 }}
+        whileHover={{ scale: 1.65, rotateY: 5 }}
         transition={{ type: "spring", stiffness: 300, damping: 10 }}
       >
         <img src={project.image} alt={project.title} className="w-full h-auto rounded-lg shadow-2xl" />

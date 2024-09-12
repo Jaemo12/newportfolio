@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          © 2024 Your Name. All rights reserved.
+          © 2024 AMIT SAMANT. All rights reserved.
         </motion.p>
         <motion.p 
           className="text-center text-gray-400 mt-6 text-lg max-w-2xl mx-auto"

@@ -110,7 +110,7 @@ const AboutSection: React.FC = () => {
                 1000,
                 "I'm a Problem Solver",
                 1000,
-                "I'm a Artist",
+                "I'm a Creator",
                 1000,
               ]}
               wrapper="h2"
@@ -167,7 +167,7 @@ const AboutSection: React.FC = () => {
             animate={isJourneyInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            I hold a degree in Computer Science from [Your University]. My educational background has provided me with a strong foundation in software development principles and problem-solving skills.
+            Hi there! I'm a software developer who loves turning caffeine into code.  With two years of experience and a Master's in Computer Science, I'm all about building elegant solutions.  But hey, it's not all about the tech.  I hail from a small mountain town in India (Pithoragarh, represent!), and I'm also a bit of an art enthusiast.  Currently soaking up the Texas sun in Dallas, and always open to exciting new projects!
           </motion.p>
         </div>
       </motion.div>

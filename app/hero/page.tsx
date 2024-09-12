@@ -70,7 +70,7 @@ const ParallaxHero: React.FC = () => {
           transition={{ duration: 1.5, ease: "easeOut" }}
         >
           <img
-            src="photo3.jpeg"
+            src="back.jpeg"
             alt="Hero background"
             className="w-full h-full object-cover"
             onLoad={() => setImageLoaded(true)} 
@@ -182,11 +182,11 @@ const ParallaxHero: React.FC = () => {
       </motion.div>
 
       <Section
-        title="Creative Vision"
-        content="Transforming ideas into captivating digital experiences that inspire and engage."
+        title="Crafting Digital Experiences That Resonate"
+        content="Turning visions into reality, building websites and applications that leave a lasting impression."
         media={
           <motion.img
-            src="https://assets.lummi.ai/assets/QmRyemCVGyhZ21QQUZaQh2gyJFepunhb3sgrdfe9ih5QFS?auto=format&w=1500"
+            src="/hero.jpeg"
             alt="Creative Vision"
             className="w-full h-full object-cover rounded-lg shadow-lg image-glow"
             style={{ y: smoothYImage, x: xLeft }}
@@ -198,8 +198,8 @@ const ParallaxHero: React.FC = () => {
       />
 
       <Section
-        title="Innovative Solutions"
-        content="Crafting cutting-edge web applications that push the boundaries of what's possible online."
+        title="Where Innovation Meets Imagination"
+        content="We craft web experiences that spark curiosity and drive results."
         media={
           <motion.video
             ref={videoRef1}
@@ -218,11 +218,11 @@ const ParallaxHero: React.FC = () => {
       />
 
       <Section
-        title="Technical Expertise"
-        content="Mastering the latest web technologies to deliver seamless, high-performance digital solutions."
+        title= "Staying Ahead of the Curve"
+        content="Building seamless, high-performance web solutions."
         media={
           <motion.img
-            src="https://assets.lummi.ai/assets/QmeH5tKTmET9c4JeDfTTWb7fzmMLapxuSoDTXmp53ic6vp?auto=format&w=1500"
+            src="/hero2.jpeg"
             alt="Technical Expertise"
             className="w-full h-full object-cover rounded-lg shadow-lg image-glow"
             style={{ y: smoothYImage, x: xLeft }}
@@ -234,8 +234,8 @@ const ParallaxHero: React.FC = () => {
       />
 
       <Section
-        title="Collaborative Spirit"
-        content="Fostering partnerships and teamwork to bring ambitious projects to life. Let's create something amazing together!"
+        title="Open Minds, Open Doors"
+        content="We're more than just developers – we're your partners on the path to digital success. Let's embark on this journey together!"
         media={
           <motion.video
             ref={videoRef2}

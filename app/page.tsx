@@ -1,9 +1,8 @@
 'use client';
-// pages/index.tsx
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import Hero from './hero/page';
 import Navbar from './navbar/page';
+import Hero from './hero/page';
 import AboutSection from './about/page';
 import WorkExperience from './workex/page';
 import Projects from './projects/page';
@@ -39,14 +38,28 @@ const HomePage: React.FC = () => {
 
       <main className="bg-black text-white">
         <Navbar />
-        <Hero />
-        <AboutSection />
+        <section id="home">
+          <Hero />
+        </section>
+        <section id="about">
+          <AboutSection />
+        </section>
         <BlurringText />
-        <WorkExperience />
-        <Projects />
-        <ArtPortfolio />
-        <SocialsPage />
-        <ContactMePage />
+        <section id="workex">
+          <WorkExperience />
+        </section>
+        <section id="projects">
+          <Projects />
+        </section>
+        <section id="art">
+          <ArtPortfolio />
+        </section>
+        <section id="social">
+          <SocialsPage />
+        </section>
+        <section id="contact">
+          <ContactMePage />
+        </section>
         <Footer />
       </main>
     </>

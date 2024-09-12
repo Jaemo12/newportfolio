@@ -1,46 +1,67 @@
-"use client";
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Home, Briefcase, FolderOpen, FileText, Users, Mail } from 'lucide-react';
-import Link from 'next/link';
 import { LucideProps } from 'lucide-react';
 
 interface NavItemProps {
   icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref">>;
   label: string;
-  href: string; 
+  targetId: string;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ icon: Icon, label, href }) => {
+const NavItem: React.FC<NavItemProps> = ({ icon: Icon, label, targetId }) => {
   const [isHovered, setIsHovered] = useState(false);
 
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <Link href={href} legacyBehavior>
-      <a className="no-underline"> 
-        <motion.div
-          className="relative flex items-center cursor-pointer"
-          onHoverStart={() => setIsHovered(true)}
-          onHoverEnd={() => setIsHovered(false)}
+    <a href={`#${targetId}`} onClick={handleClick} className="no-underline">
+      <motion.div
+        className="relative flex items-center cursor-pointer"
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
+      >
+        <Icon className="w-5 h-5 text-gray-400" />
+        <motion.span
+          className="ml-2 text-sm font-medium text-gray-400"
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : -10 }}
+          transition={{ duration: 0.2 }}
         >
-          <Icon className="w-5 h-5 text-gray-400" />
-          <motion.span
-            className="ml-2 text-sm font-medium text-gray-400"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : -10 }}
-            transition={{ duration: 0.2 }}
-          >
-            {label}
-          </motion.span>
-          <motion.div
-            className="absolute bottom-0 left-0 right-0 h-0.5 bg-white"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: isHovered ? 1 : 0 }}
-            transition={{ duration: 0.2 }}
-          />
-        </motion.div>
-      </a>
-    </Link>
+          {label}
+        </motion.span>
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-white"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: isHovered ? 1 : 0 }}
+          transition={{ duration: 0.2 }}
+        />
+      </motion.div>
+    </a>
+  );
+};
+
+const AnimatedName = ({ name }: { name: string }) => {
+  return (
+    <div className="flex">
+      {name.split('').map((char, index) => (
+        <motion.span
+          key={index}
+          className="text-white text-xl font-semibold"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </div>
   );
 };
 
@@ -50,16 +71,16 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <span className="text-white text-xl font-semibold">Amit Samant</span>
+            <AnimatedName name="Amit Samant" />
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <NavItem icon={Home} label="Home" href="/" /> 
-              <NavItem icon={Briefcase} label="Work Experience" href="/workex" /> 
-              <NavItem icon={FolderOpen} label="Projects" href="/projects" /> 
-              <NavItem icon={FileText} label="Resume" href="/resume" /> 
-              <NavItem icon={Users} label="Socials" href="/social" /> 
-              <NavItem icon={Mail} label="Contact" href="/contact" /> 
+              <NavItem icon={Home} label="Home" targetId="home" />
+              <NavItem icon={Briefcase} label="Work Experience" targetId="workex" />
+              <NavItem icon={FolderOpen} label="Projects" targetId="projects" />
+              <NavItem icon={FileText} label="Resume" targetId="social" />
+              <NavItem icon={Users} label="Socials" targetId="social" />
+              <NavItem icon={Mail} label="Contact" targetId="contact" />
             </div>
           </div>
         </div>

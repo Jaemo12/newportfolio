@@ -7,11 +7,33 @@ const ContactMePage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [status, setStatus] = useState('');
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log('Form submitted:', { name, email, message });
+    setStatus('Sending...');
+
+    try {
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, message }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      setStatus('Message sent successfully!');
+      setName('');
+      setEmail('');
+      setMessage('');
+    } catch (error) {
+      console.error('Error sending email:', error);
+      setStatus('Failed to send message. Please try again.');
+    }
   };
 
   return (
@@ -39,6 +61,7 @@ const ContactMePage = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full p-3 bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow shadow-[0_0_10px_rgba(0,255,255,0.3)]"
+              required
             />
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -48,6 +71,7 @@ const ContactMePage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow shadow-[0_0_10px_rgba(0,255,255,0.3)]"
+              required
             />
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -57,6 +81,7 @@ const ContactMePage = () => {
               onChange={(e) => setMessage(e.target.value)}
               rows={4}
               className="w-full p-3 bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow shadow-[0_0_10px_rgba(0,255,255,0.3)]"
+              required
             />
           </motion.div>
           <motion.button
@@ -68,6 +93,15 @@ const ContactMePage = () => {
             Send Message
           </motion.button>
         </motion.form>
+        {status && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-4 text-center"
+          >
+            {status}
+          </motion.p>
+        )}
         <motion.div
           className="mt-12 space-y-4"
           initial={{ opacity: 0 }}
@@ -76,15 +110,15 @@ const ContactMePage = () => {
         >
           <div className="flex items-center space-x-4">
             <Mail className="text-blue-400" />
-            <span>contact@example.com</span>
+            <span>samantamitus@gmail.com</span>
           </div>
           <div className="flex items-center space-x-4">
             <Phone className="text-blue-400" />
-            <span>+1 (123) 456-7890</span>
+            <span>+1 (361) 910-4013</span>
           </div>
           <div className="flex items-center space-x-4">
             <MapPin className="text-blue-400" />
-            <span>123 Tech Street, Silicon Valley, CA 94000</span>
+            <span>Arlington, Texas, United States</span>
           </div>
         </motion.div>
       </div>

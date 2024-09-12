@@ -43,11 +43,11 @@ const SocialIcon: React.FC<SocialIconProps> = ({ icon: Icon, link, color, name }
 
 const SocialsPage = () => {
   const socialLinks: SocialIconProps[] = [
-    { icon: Twitter, link: 'https://twitter.com/yourusername', color: 'blue-400', name: 'Twitter' },
-    { icon: Facebook, link: 'https://facebook.com/yourusername', color: 'blue-600', name: 'Facebook' },
-    { icon: Instagram, link: 'https://instagram.com/yourusername', color: 'pink-500', name: 'Instagram' },
-    { icon: Linkedin, link: 'https://linkedin.com/in/yourusername', color: 'blue-700', name: 'LinkedIn' },
-    { icon: Github, link: 'https://github.com/yourusername', color: 'purple-400', name: 'GitHub' },
+    { icon: Twitter, link: 'https://twitter.com/AmitSamant7146', color: 'blue-400', name: 'Twitter' },
+    { icon: Facebook, link: 'https://facebook.com/amitsamantscience', color: 'blue-600', name: 'Facebook' },
+    { icon: Instagram, link: 'https://instagram.com/_grim_jaw_', color: 'pink-500', name: 'Instagram' },
+    { icon: Linkedin, link: 'https://linkedin.com/in/amitsamant12', color: 'blue-700', name: 'LinkedIn' },
+    { icon: Github, link: 'https://github.com/Jaemo12', color: 'purple-400', name: 'GitHub' },
   ];
 
   const headingVariants = {
@@ -130,7 +130,7 @@ const SocialsPage = () => {
           transition={{ delay: 1.5 }}
         >
           <motion.a
-            href="#"
+            href="/resume.pdf"
             className="inline-block px-16 py-8 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-full text-2xl transition-all duration-300 shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(255, 0, 255, 0.7)' }}
             whileTap={{ scale: 0.95 }}
