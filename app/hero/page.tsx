@@ -245,7 +245,7 @@ const ParallaxHero: React.FC = () => {
             className="w-full h-full object-cover rounded-lg shadow-lg image-glow"
             style={{ y: smoothYVideo, x: xRight }}
           >
-            <source src="/background.mp4" type="video/mp4" />
+            <source src="/hero4.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </motion.video>
         }

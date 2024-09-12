@@ -1,13 +1,19 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Home, Briefcase, FolderOpen, FileText, Users, Mail } from 'lucide-react';
+import { Home, Briefcase, FolderOpen, FileText, Users, Mail, Linkedin, Github, Instagram } from 'lucide-react';
 import { LucideProps } from 'lucide-react';
+import './navbar.css';
 
 interface NavItemProps {
   icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref">>;
   label: string;
   targetId: string;
+}
+
+interface SocialIconProps {
+  icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref">>;
+  href: string;
 }
 
 const NavItem: React.FC<NavItemProps> = ({ icon: Icon, label, targetId }) => {
@@ -48,6 +54,21 @@ const NavItem: React.FC<NavItemProps> = ({ icon: Icon, label, targetId }) => {
   );
 };
 
+const SocialIcon: React.FC<SocialIconProps> = ({ icon: Icon, href }) => {
+  return (
+    <motion.a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-gray-400 hover:text-white transition-colors duration-200"
+      whileHover={{ scale: 1.2 }}
+      whileTap={{ scale: 0.9 }}
+    >
+      <Icon className="w-5 h-5 glow" />
+    </motion.a>
+  );
+};
+
 const AnimatedName = ({ name }: { name: string }) => {
   return (
     <div className="flex">
@@ -74,8 +95,13 @@ const Navbar = () => {
           <div className="flex items-center">
             <AnimatedName name="Amit Samant" />
           </div>
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+          <div className="hidden md:flex items-center space-x-4">
+            <div className="flex items-center space-x-8 mr-6">
+              <SocialIcon icon={Linkedin} href="https://linkedin.com/in/amitsamant12" />
+              <SocialIcon icon={Github} href="https://github.com/Jaemo12" />
+              <SocialIcon icon={Instagram} href="https://www.instagram.com/_grim_jaw_" />
+            </div>
+            <div className="flex items-baseline space-x-4">
               <NavItem icon={Home} label="Home" targetId="home" />
               <NavItem icon={Briefcase} label="Work Experience" targetId="workex" />
               <NavItem icon={FolderOpen} label="Projects" targetId="projects" />
