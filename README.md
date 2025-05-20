@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Amit Samant - Portfolio Website
 
-## Getting Started
+![Portfolio Screenshot](public/portfolio-screenshot.png)
 
-First, run the development server:
+## 🚀 [View My Portfolio]([https://portfolio-amit-samant.vercel.app/](https://amitportfolio-rho.vercel.app/))
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 📋 Overview
+
+Welcome to my portfolio repository! This website showcases my skills, experience, and projects as a software developer specializing in full-stack development with expertise in React, Next.js, and cloud technologies.
+
+## ✨ Features
+
+- **Responsive Design**: Optimized for all devices from mobile to desktop
+- **Interactive UI**: Smooth animations and transitions for an engaging user experience
+- **Project Showcase**: Detailed case studies of my most significant work
+- **Tech Stack Display**: Visual representation of my technical skills
+- **Contact Form**: Direct way to reach out for opportunities or collaboration
+
+## 🛠️ Built With
+
+- **Framework**: [Next.js](https://nextjs.org/)
+- **Styling**: Tailwind CSS
+- **Deployment**: Vercel
+- **Animation**: Framer Motion
+- **Icons**: React Icons
+- **Contact**: EmailJS
+
+## 🏗️ Project Structure
+
+```
+├── app/               # Next.js app directory structure
+│   ├── page.tsx       # Homepage component
+│   ├── about/         # About me section
+│   ├── projects/      # Projects showcase
+│   ├── contact/       # Contact form
+│   └── layout.tsx     # Main layout wrapper
+├── components/        # Reusable UI components
+├── public/            # Static assets
+└── styles/            # Global styles and Tailwind config
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To run this project locally:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+# Clone the repository
+git clone https://github.com/Jaemo12/newportfolio.git
 
-## Learn More
+# Navigate to the project directory
+cd portfolio
 
-To learn more about Next.js, take a look at the following resources:
+# Install dependencies
+npm install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Start the development server
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-## Deploy on Vercel
+## 📱 Features In Development
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Dark/Light mode toggle
+- Blog section for technical articles
+- Project filtering by technology
+- Internationalization support
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## 📊 Analytics
+
+The site uses Vercel Analytics to collect anonymous usage data to help improve the user experience.
+
+## 📄 License
+
+This project is available for viewing and inspiration. If you'd like to use any part of the code for your own portfolio, please provide attribution.
+
+## 🔗 Connect With Me
+
+- [LinkedIn](https://linkedin.com/in/amitsamant12)
+- [GitHub](https://github.com/Jaemo12)
+- Email: samantamitus@gmail.com
+
+---
+
+<p align="center">
+  Made with Next.js and deployed on Vercel
+</p>
