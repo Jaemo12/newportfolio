@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Navbar from './navbar/page';
@@ -12,6 +13,8 @@ import ContactMePage from './contact/page';
 import ArtPortfolio from './art/page';
 import Footer from './components/footer/footer';
 import LoadingPage from './LoadingPage/page';
+import { SectionTransition } from './components/sectionTransition';
+import ServicesPage from './services/page';
 
 const HomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +24,6 @@ const HomePage: React.FC = () => {
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 3000);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -35,31 +37,41 @@ const HomePage: React.FC = () => {
         <title>Your Name | Portfolio</title>
         <meta name="description" content="A showcase of my work and skills" />
       </Head>
-
       <main className="bg-black text-white">
         <Navbar />
-        <section id="home">
+        
+        <SectionTransition id="home" effect="zoom">
           <Hero />
-        </section>
-        <section id="about">
-          <AboutSection />
-        </section>
+        </SectionTransition>
+        
         <BlurringText />
-        <section id="workex">
+        
+        <SectionTransition id="about" effect="slide">
+          <AboutSection />
+        </SectionTransition>
+        
+        <SectionTransition id="workex" effect="slide">
           <WorkExperience />
-        </section>
-        <section id="projects">
+        </SectionTransition>
+        
+        <SectionTransition id="projects" effect="flip">
           <Projects />
-        </section>
-        <section id="art">
+        </SectionTransition>
+        
           <ArtPortfolio />
-        </section>
-        <section id="social">
+        
+        
+        
+        <SectionTransition id="services" effect="slide">
+          <ServicesPage />
+        </SectionTransition>
+        <SectionTransition id="social" effect="slide">
           <SocialsPage />
-        </section>
-        <section id="contact">
+        </SectionTransition>
+        <SectionTransition id="contact" effect="zoom">
           <ContactMePage />
-        </section>
+        </SectionTransition>
+        
         <Footer />
       </main>
     </>

@@ -6,16 +6,12 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 0, 0, 0;
   --background-end-rgb: 30, 30, 30;
-  --accent-color: 0, 255, 255; /* Neon cyan accent */
+  --accent-color: 0, 255, 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 10, 10, 10;
-    --accent-color: 255, 0, 255; /* Neon magenta accent */
-  }
+html {
+  scroll-behavior: smooth;
+  height: 100%;
 }
 
 body {
@@ -26,43 +22,50 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  margin: 0;
-  padding: 0;
+  min-height: 100%;
   overflow-x: hidden;
-  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar styles */
+/* Optimize scrollbar appearance */
 ::-webkit-scrollbar {
-  width: 2px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(var(--background-start-rgb), 0.2);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(var(--accent-color), 0.7);
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--accent-color), 0.9);
+  background: rgba(255, 255, 255, 0.3);
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  
-  .neon-text {
-    color: rgb(var(--accent-color));
-    text-shadow: 0 0 5px rgba(var(--accent-color), 0.7), 0 0 10px rgba(var(--accent-color), 0.5);
-  }
+/* Optimize performance */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 
-  .neon-bg {
-    background: rgba(var(--accent-color), 0.2);
-    box-shadow: 0 0 10px rgba(var(--accent-color), 0.5);
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    scroll-behavior: smooth;
   }
+}
+.perspective {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.page-content {
+  width: 100%;
+  min-height: 100vh;
+  transform-origin: center;
+  position: relative;
 }

@@ -1,294 +1,277 @@
 'use client';
-import React, { useRef, useEffect, useState } from 'react';
-import { motion, useScroll, useTransform, useSpring, useAnimation, MotionValue } from 'framer-motion';
-import './hero.css';
 
-const icons = [
-  { name: 'love', path: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z', color: '#990000' },
-  { name: 'death', path: 'M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.59-13L12 10.59 8.41 7 7 8.41 10.59 12 7 15.59 8.41 17 12 13.41 15.59 17 17 15.59 13.41 12 17 8.41z', color: '#222222' },
-  { name: 'robots', path: 'M22 14h-1c0-3.87-3.13-7-7-7h-1V5.73c1.16-.41 2-1.52 2-2.83 0-1.66-1.34-3-3-3S9 1.24 9 2.9c0 1.31.84 2.42 2 2.83V7h-1c-3.87 0-7 3.13-7 7H2v2h1v3c0 2.21 1.79 4 4 4h10c2.21 0 4-1.79 4-4v-3h1v-2zM11 2.9c0-.55.45-1 1-1s1 .45 1 1-.45 1-1 1-1-.45-1-1zM7 17v-3h1v-2H7c0-2.76 2.24-5 5-5h1v2h2V9h1c2.76 0 5 2.24 5 5h-1v2h1v3c0 1.1-.9 2-2 2H9c-1.1 0-2-.9-2-2z', color: '#003366' },
+import React, { useEffect, useState, useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
+
+const NeonTitle = dynamic(() => import('../components/neonTitle/neonTitle'), {
+  ssr: false,
+  loading: () => <div className="w-full h-48 flex items-center justify-center"><p className="text-3xl text-center text-white/30">Loading Title...</p></div>, 
+});
+
+// Updated hero segments data
+const heroSegments = [
+  {
+    id: 'intro',
+    mainText: "Transforming Ideas into Digital Realities.",
+    introQuote: "// The intersection of creativity and code is where innovation thrives.",
+    accentColor: '#008080', // Deep Teal for intro accents
+    glowColor: 'rgba(0, 128, 128, 0.4)',
+  },
+  {
+    id: 'mainQuoteSection',
+    quote: "The details are not the details. They make the design.",
+    author: "Charles Eames",
+    backgroundImage: '/h3.jpg', // REPLACE with your image for this section
+    accentColor: '#D4AF37', // Warm Gold
+    glowColor: 'rgba(212, 175, 55, 0.5)', // Slightly more opaque glow for better visibility
+  }
 ];
 
-interface SectionProps {
-  title: string;
-  content: string;
-  media: React.ReactNode;
-  right?: boolean;
-  yValue: MotionValue<number>;
-  xValue: MotionValue<string>;
-}
-
-const ParallaxHero: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
-
-  const controls = useAnimation();
-
-  useEffect(() => {
-    controls.start("visible");
-  }, [controls]);
-
-  const yText = useTransform(scrollYProgress, [0, 1], ["0%", "-60%"]);
-  const yImage = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"]);
-  const yVideo = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
-  const xLeft = useTransform(scrollYProgress, [0, 1], ["0%", "-5%"]);
-  const xRight = useTransform(scrollYProgress, [0, 1], ["0%", "5%"]);
-  const opacityValue = useTransform(scrollYProgress, [0, 0.3, 1], [1, 1, 0.5]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
-
-  const smoothYText = useSpring(yText, { stiffness: 100, damping: 30 });
-  const smoothYImage = useSpring(yImage, { stiffness: 100, damping: 30 });
-  const smoothYVideo = useSpring(yVideo, { stiffness: 100, damping: 30 });
-
-  const videoRef1 = useRef<HTMLVideoElement>(null);
-  const videoRef2 = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (videoRef1.current) {
-      videoRef1.current.play();
-    }
-    if (videoRef2.current) {
-      videoRef2.current.play();
-    }
-  }, []);
-
-  const [imageLoaded, setImageLoaded] = useState(false);
+// Component for animated digital rain/particles
+const DigitalRainParticle = ({ delay, accentColor }: { delay: number; accentColor: string; }) => {
+  const initialY = `${Math.random() * -70 - 30}%`;
+  const duration = Math.random() * 8 + 8;
 
   return (
-    <div ref={containerRef} className="relative min-h-[400vh] overflow-hidden bg-black text-cyan-300">
-      <motion.div 
-        className="sticky top-0 h-screen w-full overflow-hidden"
-      >
-        <motion.div
-          className="absolute inset-0 z-0"
-          style={{ scale }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-        >
-          <img
-            src="back.jpeg"
-            alt="Hero background"
-            className="w-full h-full object-cover"
-            onLoad={() => setImageLoaded(true)} 
-          />
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-t from-black to-transparent"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 2, delay: 0.5 }}
-          />
-        </motion.div>
-
-        {imageLoaded && ( 
-          <motion.div 
-            className="absolute top-40 inset-x-0 flex flex-col items-center justify-center z-10" 
-          >
-            <motion.div
-              className="flex space-x-8 mb-12"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              {icons.map((icon, index) => (
-                <motion.svg
-                  key={icon.name}
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="72"
-                  height="72"
-                  fill={icon.color}
-                  className="cursor-pointer neon-glow"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    y: [0, -10, 0],
-                    rotate: [0, 360, 0],
-                    filter: [
-                      "drop-shadow(0 0 5px rgba(255, 255, 255, 0.7))",
-                      "drop-shadow(0 0 20px rgba(255, 255, 255, 1))",
-                      "drop-shadow(0 0 5px rgba(255, 255, 255, 0.7))"
-                    ]
-                  }}
-                  transition={{
-                    duration: 3,
-                    delay: index * 0.5,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    ease: "easeInOut"
-                  }}
-                  whileHover={{ 
-                    scale: 1.5,
-                    rotate: 360, 
-                    filter: "drop-shadow(0 0 30px rgba(255, 255, 255, 1))"
-                  }}
-                >
-                  <defs>
-                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#ff4d4d" />
-                      <stop offset="100%" stopColor="#ff9a00" />
-                    </linearGradient>
-                  </defs>
-                  <path d={icon.path} />
-                </motion.svg>
-              ))}
-            </motion.div>
-          </motion.div>
-        )}
-
-        <motion.div
-          className="absolute inset-0 flex flex-col items-center justify-center z-10"
-          style={{ opacity: opacityValue }}
-        >
-          <motion.div
-            className="flex space-x-8 mb-12"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-          </motion.div>
-          <motion.h1
-            className="text-7xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 to-cyan-100 neon-text"
-            style={{ y: smoothYText }}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 2.5 }}
-          >
-            Hello
-          </motion.h1>
-          <motion.p
-            className="text-3xl mb-4 text-cyan-300 neon-text"
-            style={{ y: smoothYText }}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 3.3 }}
-          >
-            Welcome to my website
-          </motion.p>
-          <motion.p
-            className="text-xl mb-8 text-cyan-300 neon-text"
-            style={{ y: smoothYText }}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 4.1 }}
-          >
-            Scroll down to know more about me
-          </motion.p>
-        </motion.div>
-      </motion.div>
-
-      <Section
-        title="Crafting Digital Experiences That Resonate"
-        content="Turning visions into reality, building websites and applications that leave a lasting impression."
-        media={
-          <motion.img
-            src="/hero.jpeg"
-            alt="Creative Vision"
-            className="w-full h-full object-cover rounded-lg shadow-lg image-glow"
-            style={{ y: smoothYImage, x: xLeft }}
-          />
-        }
-        right
-        yValue={smoothYText}
-        xValue={xLeft}
-      />
-
-      <Section
-        title="Where Innovation Meets Imagination"
-        content="We craft web experiences that spark curiosity and drive results."
-        media={
-          <motion.video
-            ref={videoRef1}
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover rounded-lg shadow-lg image-glow"
-            style={{ y: smoothYVideo, x: xRight }}
-          >
-            <source src="/background.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </motion.video>
-        }
-        yValue={smoothYText}
-        xValue={xRight}
-      />
-
-      <Section
-        title= "Staying Ahead of the Curve"
-        content="Building seamless, high-performance web solutions."
-        media={
-          <motion.img
-            src="/hero2.jpeg"
-            alt="Technical Expertise"
-            className="w-full h-full object-cover rounded-lg shadow-lg image-glow"
-            style={{ y: smoothYImage, x: xLeft }}
-          />
-        }
-        right
-        yValue={smoothYText}
-        xValue={xLeft}
-      />
-
-      <Section
-        title="Open Minds, Open Doors"
-        content="We're more than just developers – we're your partners on the path to digital success. Let's embark on this journey together!"
-        media={
-          <motion.video
-            ref={videoRef2}
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover rounded-lg shadow-lg image-glow"
-            style={{ y: smoothYVideo, x: xRight }}
-          >
-            <source src="/hero4.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </motion.video>
-        }
-        yValue={smoothYText}
-        xValue={xRight}
-      />
-    </div>
+    <motion.span
+      className="absolute text-sm opacity-20"
+      style={{
+        left: `${Math.random() * 100}%`,
+        color: Math.random() > 0.4 ? accentColor : 'rgba(200,220,255,0.15)',
+        textShadow: `0 0 6px ${accentColor}50`,
+      }}
+      initial={{ y: initialY }}
+      animate={{ y: '130%' }}
+      transition={{ duration, repeat: Infinity, ease: "linear", delay }}
+    >
+      {['0', '1', '<', '>', '/', ';', '{', '}', '(', ')', '=', '+', '-'][Math.floor(Math.random() * 14)]}
+    </motion.span>
   );
 };
 
-const Section: React.FC<SectionProps> = ({ title, content, media, right = false, yValue, xValue }) => (
-  <motion.div
-    className="min-h-screen flex items-center justify-center p-8"
-    initial={{ opacity: 0 }}
-    whileInView={{ opacity: 1 }}
-    viewport={{ once: true, amount: 0.3 }}
-    transition={{ duration: 0.8 }}
-  >
-    <div className={`max-w-6xl mx-auto flex flex-col ${right ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-12`}>
-      <motion.div
-        className="w-full md:w-1/2"
-        initial={{ opacity: 0, x: right ? 50 : -50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.8 }}
-        style={{ y: yValue, x: xValue }}
-      >
-        <h2 className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 to-cyan-100 neon-text">{title}</h2>
-        <p className="text-xl text-cyan-300 neon-text">{content}</p>
-      </motion.div>
-      <motion.div
-        className="w-full md:w-1/2"
-        initial={{ opacity: 0, x: right ? -50 : 50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="bg-white/5 backdrop-blur-sm p-4 rounded-lg shadow-2xl container-glow">
-          {media}
-        </div>
-      </motion.div>
-    </div>
-  </motion.div>
-);
+// Section component for the single Quote Section
+const QuoteSection = ({ segment }: { segment: typeof heroSegments[1] }) => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'] 
+  });
 
-export default ParallaxHero;
+  // Parallax for the background image
+  const imageY = useTransform(scrollYProgress, [0, 1], ['-20%', '10%']); // Adjust parallax range
+  const imageOpacity = useTransform(scrollYProgress, [0.1, 0.4, 0.8, 1], [0, 1, 1, 0]); // Control overall section visibility
+  const imageScale = useTransform(scrollYProgress, [0.1, 0.4, 0.8, 1], [1.15, 1.05, 1.05, 1.15]); // Image scales slightly with scroll
+
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      setMousePosition({ x, y });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+  
+  const contentVariants = {
+    hidden: { opacity: 0, y: 40, filter: 'blur(5px)' },
+    visible: (delay: number = 0) => ({
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: { duration: 1.1, delay, ease: [0.22, 1, 0.36, 1] },
+    }),
+  };
+
+  return (
+    <section 
+      ref={sectionRef} 
+      className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4 py-24 md:py-36"
+      // Apply scroll-based opacity and scale to the entire section for smoother transitions
+      // style={{ opacity: imageOpacity, scale: imageScale }} 
+      // This might be too much if content also animates opacity. Let's keep it on image for now.
+    >
+      {/* Background Image - Positioned to fill the section */}
+      {segment.backgroundImage && (
+        <motion.div 
+          className="absolute inset-0 z-0" // Ensure it's behind the quote
+          style={{ 
+            opacity: imageOpacity, // Fade image in/out with scroll
+            scale: imageScale,     // Scale image with scroll
+            y: imageY              // Parallax image with scroll
+          }}
+        >
+          <motion.div
+            className="absolute inset-0 w-full h-full"
+            style={{
+              x: mousePosition.x * -15, // Mouse parallax
+              y: mousePosition.y * -15,
+              scale: 1.15, // Base scale for parallax movement, slightly larger to avoid edges
+            }}
+            transition={{ type: 'spring', stiffness: 50, damping: 20 }}
+          >
+            <Image
+              src={segment.backgroundImage}
+              alt={`${segment.author} quote background`}
+              fill
+              quality={85}
+              className="object-cover"
+              priority 
+            />
+          </motion.div>
+          {/* Darkening overlay for text legibility over the image */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm"></div> 
+        </motion.div>
+      )}
+
+      {/* Quote and Author - Positioned above the background image */}
+      <motion.div 
+        className="relative z-10 max-w-4xl mx-auto text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.25 }} // Trigger when 25% is visible
+        transition={{ staggerChildren: 0.3 }}
+      >
+        <motion.blockquote
+          variants={contentVariants}
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-great-vibes tracking-normal leading-tight md:leading-snug mb-8"
+          style={{ 
+            color: segment.accentColor, 
+            textShadow: `0 0 20px ${segment.glowColor}, 0 0 10px ${segment.accentColor}` // Enhanced text shadow for glow
+          }}
+          whileHover={{ 
+            scale: 1.02, 
+            textShadow: `0 0 30px ${segment.glowColor}, 0 0 15px ${segment.accentColor}`, 
+            transition: {duration: 0.25, ease: "easeOut"} 
+          }}
+        >
+          &quot;{segment.quote}&quot;
+        </motion.blockquote>
+        <motion.p
+          variants={contentVariants}
+          custom={0.2} // Delay for author
+          className="text-md sm:text-lg text-white/80 font-roboto-mono" // Increased author text opacity
+          style={{color: `${segment.accentColor}E0`}} // Slightly more opaque author color
+        >
+          — {segment.author}
+        </motion.p>
+      </motion.div>
+    </section>
+  );
+};
+
+
+const PremiumHeroSection = () => {
+  const [neonTitleVisible, setNeonTitleVisible] = useState(false);
+  
+  useEffect(() => {
+    const titleTimer = setTimeout(() => {
+      setNeonTitleVisible(true);
+    }, 200); 
+    return () => clearTimeout(titleTimer);
+  }, []);
+
+  const introTextRevealVariants = {
+    hidden: { opacity: 0, y: 20, filter: 'blur(2px)' },
+    visible: (delay: number = 0) => ({
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] },
+    }),
+  };
+
+  return (
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        html, body {
+          overflow-x: hidden;
+        }
+        body {
+          font-family: 'Inter', sans-serif;
+          background-color: #0A0A0A;
+          color: #E5E7EB; 
+        }
+        .font-great-vibes { font-family: 'Great Vibes', cursive; }
+        .font-roboto-mono { font-family: 'Roboto Mono', monospace; }
+      `}</style>
+
+      <div className="bg-[#0A0A0A] text-white overflow-x-hidden"> {/* Root overflow-x-hidden */}
+        
+        <section 
+          className="h-screen flex flex-col items-center justify-center text-center p-4 relative"
+        >
+          <div className="absolute inset-0 z-[-1] overflow-hidden">
+            {Array.from({ length: 40 }).map((_, i) => (
+              <DigitalRainParticle key={`rain-${i}`} delay={Math.random() * 2.5} accentColor={heroSegments[0].accentColor} />
+            ))}
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-[2.5px]"></div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, filter: "blur(4px)" }}
+            animate={{ 
+              opacity: neonTitleVisible ? 1 : 0, 
+              scale: neonTitleVisible ? 1 : 0.9,
+              filter: neonTitleVisible ? "blur(0px)" : "blur(4px)"
+            }}
+            transition={{ duration: 1.0, delay: 0, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-6 md:mb-8"
+          >
+            <NeonTitle />
+          </motion.div>
+          
+          <motion.p
+            variants={introTextRevealVariants}
+            initial="hidden"
+            animate={neonTitleVisible ? "visible" : "hidden"}
+            custom={0.3}
+            className="text-xl md:text-2xl lg:text-3xl text-white/90 font-light max-w-3xl tracking-wide leading-relaxed"
+          >
+            {heroSegments[0].mainText}
+          </motion.p>
+          <motion.p
+            variants={introTextRevealVariants}
+            initial="hidden"
+            animate={neonTitleVisible ? "visible" : "hidden"}
+            custom={0.5}
+            className="mt-8 text-md md:text-lg text-white/70 font-roboto-mono max-w-2xl italic px-4"
+            style={{textShadow: `0 0 8px ${heroSegments[0].glowColor}`}}
+          >
+            {heroSegments[0].introQuote}
+          </motion.p>
+
+          <motion.div
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: neonTitleVisible ? [0, 0.6, 0, 0.6, 0] : 0 }}
+            transition={{ duration: 2.8, delay: 0.8, repeat: Infinity, ease: "linear" }}
+          >
+            <svg width="24" height="30" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-auto text-white/40">
+              <motion.path 
+                d="M12 4V26M12 26L7 21M12 26L17 21" 
+                stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.9, delay: 0.7, ease: "circOut" }}
+              />
+            </svg>
+          </motion.div>
+        </section>
+
+        {/* Single Quote Section */}
+        <QuoteSection 
+            segment={heroSegments[1] as typeof heroSegments[1]}
+        />
+      </div>
+    </>
+  );
+};
+
+export default PremiumHeroSection;

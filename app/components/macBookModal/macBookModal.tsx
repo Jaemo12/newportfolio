@@ -1,169 +1,397 @@
-// components/MacBookModal.tsx
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, X, ExternalLink, Github } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, ArrowLeft, ArrowRight, ExternalLink, Github, ZoomIn, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 
-export interface Project {
+// Define the Project interface that the modal expects
+interface Project {
   title: string;
   description: string;
-  image: string;
+  images: string[]; // Crucial for the galleries
   technologies: string[];
   features: string[];
-  stats: Record<string, string | number>;
+  stats: { [key: string]: string };
   link: string;
   github: string;
+  color: string; 
+  glowColor: string; 
 }
 
-interface MacBookModalProps {
-  project: Project;
+interface ModernProjectModalProps {
+  project: Project | null;
   onClose: () => void;
   onNext: () => void;
   onPrev: () => void;
 }
 
-const MacBookModal: React.FC<MacBookModalProps> = ({ project, onClose, onNext, onPrev }) => (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-md flex items-center justify-center p-4 z-50"
-  >
+const ModernProjectModal: React.FC<ModernProjectModalProps> = ({ project, onClose, onNext, onPrev }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    setCurrentImageIndex(0); // Reset image index when project changes
+    if (project) { // Apply custom scrollbar color when project is available
+      const scrollbarStyle = document.getElementById('custom-scrollbar-style');
+      if (scrollbarStyle) {
+        scrollbarStyle.innerHTML = `
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: ${project.color}99 !important;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: ${project.color} !important;
+          }
+          .custom-scrollbar {
+            scrollbar-color: ${project.color}99 transparent !important;
+          }
+        `;
+      }
+    }
+  }, [project]);
+
+  if (!project) return null;
+
+  // Ensure projectImages always has at least one valid source
+  const projectImages = project.images && project.images.length > 0 
+    ? project.images 
+    : ['/api/placeholder/1280/720?text=Project+Image+Not+Found']; // More descriptive placeholder
+
+  const handleImageClick = () => setIsFullscreen(true);
+  const closeFullscreen = () => setIsFullscreen(false);
+
+  const navigateImage = (direction: 'next' | 'prev') => {
+    let newIndex;
+    if (direction === 'next') {
+      newIndex = (currentImageIndex + 1) % projectImages.length;
+    } else {
+      newIndex = (currentImageIndex - 1 + projectImages.length) % projectImages.length;
+    }
+    setCurrentImageIndex(newIndex);
+  };
+
+  // --- Sub-Components ---
+
+  const FullscreenImageView = () => (
     <motion.div
-      initial={{ scale: 0.9, opacity: 0, rotateX: -10 }}
-      animate={{ scale: 1, opacity: 1, rotateX: 0 }}
-      exit={{ scale: 0.9, opacity: 0, rotateX: 10 }}
-      transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-      className="relative w-full max-w-5xl perspective-1000"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.25, ease: "circOut" }}
+      className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-lg flex items-center justify-center p-3 sm:p-4"
+      onClick={closeFullscreen}
     >
-      {/* MacBook frame */}
-      <div className="bg-[#e2e2e7] rounded-t-[20px] p-4 shadow-2xl transform-gpu rotateX-5 relative">
-        <div className="absolute top-1.5 left-1/2 transform -translate-x-1/2 w-1/4 h-1 bg-[#050506] rounded-full" />
-        {/* Screen */}
-        <div className="bg-[#050506] rounded-[10px] aspect-[16/10] p-1 relative overflow-hidden shadow-inner">
-          {/* Scrollable content */}
-          <div className="h-full overflow-y-auto pr-4 bg-white" style={{ maxHeight: 'calc(100vh - 200px)' }}>
-            <motion.div initial={{ opacity: 0, rotateY: -90 }} animate={{ opacity: 1, rotateY: 0 }} exit={{ opacity: 0, rotateY: 90 }} transition={{ duration: 0.5 }} className="flex flex-col p-8">
-              <motion.img
-                src={project.image}
-                alt={project.title}
-                className="w-16 h-16 object-cover rounded-lg mb-6 shadow-lg"
-                whileHover={{
-                  scale: 1.05,
-                  rotateY: 5,
-                  transition: { duration: 0.3 },
-                }}
+      <motion.button
+        whileHover={{ scale: 1.15, rotate: 90, boxShadow: `0 0 15px ${project.glowColor}` }}
+        whileTap={{ scale: 0.9 }}
+        onClick={(e) => { e.stopPropagation(); closeFullscreen(); }}
+        className="absolute top-4 right-4 z-10 p-2.5 rounded-full"
+        style={{ border: `1.5px solid ${project.color}`, color: project.color, backgroundColor: `rgba(16, 16, 16, 0.7)` }}
+        aria-label="Close fullscreen image"
+      >
+        <X size={20} />
+      </motion.button>
+
+      <div className="relative w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+        <motion.div 
+          className="relative max-w-[95vw] max-h-[95vh] flex items-center justify-center" // Ensure image is centered
+        >
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={`${project.title}-fullscreen-${currentImageIndex}`}
+              src={projectImages[currentImageIndex]}
+              alt={`${project.title} - Fullscreen ${currentImageIndex + 1}`}
+              className="block max-w-full max-h-full object-contain rounded-md shadow-2xl"
+              style={{ boxShadow: `0 0 35px ${project.glowColor}`}}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: "circOut" }}
+            />
+          </AnimatePresence>
+        </motion.div>
+
+        {projectImages.length > 1 && (
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/60 backdrop-blur-sm p-1.5 rounded-lg border" style={{borderColor: `${project.color}50`}}>
+          <motion.button
+            whileHover={{ scale: 1.1, backgroundColor: `${project.color}40`, boxShadow: `0 0 8px ${project.glowColor}` }}
+            whileTap={{ scale: 0.9 }}
+            onClick={(e) => { e.stopPropagation(); navigateImage('prev'); }}
+            className="p-2 rounded-md" style={{ border: `1px solid ${project.color}70`}}
+            aria-label="Previous image"
+          >
+            <ArrowLeft size={16} style={{ color: project.color }}/>
+          </motion.button>
+
+          <div className="flex gap-1.5 items-center px-1">
+            {projectImages.map((_, index) => (
+              <button
+                key={`dot-fs-${index}`}
+                onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(index); }}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ease-in-out hover:opacity-100
+                  ${index === currentImageIndex ? 'scale-125 w-3.5 opacity-100' : 'opacity-50'}
+                `}
+                style={{backgroundColor: project.color }}
+                aria-label={`Go to image ${index + 1}`}
               />
-              <motion.h2
-                className="text-3xl font-bold mb-4 text-gray-800"
-                whileHover={{
-                  scale: 1.05,
-                  color: '#4F46E5',
-                  transition: { duration: 0.3 },
-                }}
-              >
-                {project.title}
-              </motion.h2>
-              <motion.p
-                className="text-gray-600 mb-6 text-lg"
-                whileHover={{
-                  scale: 1.02,
-                  transition: { duration: 0.3 },
-                }}
-              >
-                {project.description}
-              </motion.p>
-              <motion.div className="flex flex-wrap gap-2 mb-6">
-                {project.technologies.map((tech) => (
-                  <motion.span
-                    key={tech}
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-full text-sm font-medium"
-                    whileHover={{
-                      scale: 1.1,
-                      backgroundColor: '#E5E7EB',
-                      transition: { duration: 0.2 },
-                    }}
-                  >
-                    {tech}
-                  </motion.span>
-                ))}
-              </motion.div>
-
-              <motion.h3 className="text-2xl font-semibold mb-4 text-gray-800">Key Features</motion.h3>
-              <motion.ul className="list-disc pl-5 mb-6 text-gray-600">
-                {project.features.map((feature, index) => (
-                  <motion.li key={index} whileHover={{ scale: 1.02, color: '#4F46E5', transition: { duration: 0.2 } }}>
-                    {feature}
-                  </motion.li>
-                ))}
-              </motion.ul>
-
-              <motion.h3 className="text-2xl font-semibold mb-4 text-gray-800">Project Stats</motion.h3>
-              <motion.div className="grid grid-cols-3 gap-4 mb-6">
-                {Object.entries(project.stats).map(([key, value]) => (
-                  <motion.div key={key} className="bg-gray-100 p-4 rounded-lg text-center" whileHover={{ scale: 1.05, backgroundColor: '#E5E7EB', transition: { duration: 0.2 } }}>
-                    <span className="text-2xl font-bold text-gray-800">{value}</span>
-                    <span className="block text-sm text-gray-600 capitalize">{key}</span>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              <div className="flex space-x-4 mb-6">
-                <motion.a
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:bg-blue-700"
-                  whileHover={{
-                    scale: 1.05,
-                    backgroundColor: '#4F46E5',
-                    boxShadow: '0 0 15px rgba(37, 99, 235, 0.5)',
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  View Project <ExternalLink size={18} className="ml-2" />
-                </motion.a>
-                <motion.a
-                  href={project.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:bg-gray-300"
-                  whileHover={{
-                    scale: 1.05,
-                    backgroundColor: '#E5E7EB',
-                    boxShadow: '0 0 15px rgba(107, 114, 128, 0.5)',
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  GitHub <Github size={18} className="ml-2" />
-                </motion.a>
-              </div>
-            </motion.div>
+            ))}
           </div>
 
-          {/* Navigation buttons */}
-          <div className="absolute bottom-6 right-6 flex space-x-4">
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onPrev} className="p-3 bg-gray-200 rounded-full shadow-lg hover:bg-gray-300 transition duration-300">
-              <ChevronLeft size={24} color="#4B5563" />
-            </motion.button>
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onNext} className="p-3 bg-gray-200 rounded-full shadow-lg hover:bg-gray-300 transition duration-300">
-              <ChevronRight size={24} color="#4B5563" />
-            </motion.button>
-          </div>
+          <motion.button
+            whileHover={{ scale: 1.1, backgroundColor: `${project.color}40`, boxShadow: `0 0 8px ${project.glowColor}` }}
+            whileTap={{ scale: 0.9 }}
+            onClick={(e) => { e.stopPropagation(); navigateImage('next'); }}
+            className="p-2 rounded-md" style={{ border: `1px solid ${project.color}70`}}
+            aria-label="Next image"
+          >
+            <ArrowRight size={16} style={{ color: project.color }}/>
+          </motion.button>
+        </div>
+        )}
+         <div className="absolute top-4 left-4 px-2.5 py-1 bg-black/70 rounded-full text-xs text-white/80 font-roboto-mono border" style={{borderColor: `${project.color}50`}}>
+          {currentImageIndex + 1} / {projectImages.length}
         </div>
       </div>
-      {/* MacBook base */}
-      <div className="bg-[#e2e2e7] h-3 rounded-b-[20px] shadow-2xl relative">
-        <div className="absolute left-1/2 transform -translate-x-1/2 -top-1 w-1/5 h-1 bg-[#b1b2b7] rounded-full" />
-      </div>
-
-      {/* Close button */}
-      <motion.button whileHover={{ scale: 1.1, rotate: 90 }} whileTap={{ scale: 0.9 }} onClick={onClose} className="absolute -top-4 -right-4 p-2 bg-red-500 text-white rounded-full shadow-lg z-10">
-        <X size={24} />
-      </motion.button>
     </motion.div>
-  </motion.div>
-);
+  );
 
-export default MacBookModal;
+  const ModalImageDisplay = () => (
+    <div 
+      className="relative aspect-[16/10] rounded-lg overflow-hidden group border-2 cursor-pointer shadow-lg transition-all duration-300 hover:shadow-2xl"
+      style={{ borderColor: `${project.color}70`, boxShadow: `0 0 20px -5px ${project.glowColor}` }}
+      onClick={handleImageClick}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`${project.title}-modal-${currentImageIndex}`}
+          className="w-full h-full"
+          initial={{ opacity: 0.7, x: 25 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0.7, x: -25 }}
+          transition={{ duration: 0.4, ease: "circOut" }}
+        >
+          <Image
+            src={projectImages[currentImageIndex]}
+            alt={`${project.title} - Image ${currentImageIndex + 1}`}
+            width={800} height={450} // Aspect ratio 16:9
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            priority // Prioritize loading current image
+          />
+        </motion.div>
+      </AnimatePresence>
+
+      <motion.div 
+        className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
+        aria-hidden="true"
+      >
+        <ZoomIn size={36} className="text-white opacity-90" style={{filter: `drop-shadow(0 0 8px ${project.color})`}}/>
+      </motion.div>
+
+      {projectImages.length > 1 && (
+        <>
+        <motion.button
+          onClick={(e) => { e.stopPropagation(); navigateImage('prev');}}
+          className="absolute top-1/2 left-2 transform -translate-y-1/2 z-10 p-1.5 bg-[#1a1a1a]/60 hover:bg-opacity-80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none"
+          style={{borderColor: project.color, boxShadow: `0 0 8px ${project.glowColor}`}}
+          whileHover={{ scale: 1.1, x: -2 }} whileTap={{ scale: 0.9 }} aria-label="Previous image"
+        > <ChevronLeft size={20} style={{color: project.color}}/>
+        </motion.button>
+        <motion.button
+          onClick={(e) => { e.stopPropagation(); navigateImage('next');}}
+          className="absolute top-1/2 right-2 transform -translate-y-1/2 z-10 p-1.5 bg-[#1a1a1a]/60 hover:bg-opacity-80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none"
+          style={{borderColor: project.color, boxShadow: `0 0 8px ${project.glowColor}`}}
+          whileHover={{ scale: 1.1, x: 2 }} whileTap={{ scale: 0.9 }} aria-label="Next image"
+        > <ChevronRight size={20} style={{color: project.color}}/>
+        </motion.button>
+
+        <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/50 backdrop-blur-sm p-1 rounded-full">
+          {projectImages.map((_, index) => (
+            <button
+              key={`dot-modal-${index}`}
+              onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(index); }}
+              className={`h-1.5 rounded-full transition-all duration-300 ease-in-out hover:opacity-100
+                ${index === currentImageIndex ? 'w-4 opacity-100' : 'w-1.5 opacity-60'}
+              `}
+              style={{backgroundColor: project.color }}
+              aria-label={`View image ${index + 1}`}
+            />
+          ))}
+        </div>
+        </>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        onClick={onClose}
+      >
+        <div className="absolute inset-0 bg-[#0A0A0A]/90 backdrop-blur-lg" />
+        
+        <motion.div
+          initial={{ scale: 0.92, opacity: 0, y: 15 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.92, opacity: 0, y: 15 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }} // Quintic ease-out
+          className="relative w-full max-w-4xl bg-[#161618] rounded-xl overflow-hidden border flex flex-col max-h-[90vh] shadow-2xl"
+          style={{ borderColor: `${project.color}50`, boxShadow: `0 0 50px -10px ${project.glowColor}` }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="absolute top-0 left-0 right-0 h-1.5 opacity-90" style={{ background: `linear-gradient(90deg, transparent, ${project.color}, ${project.color}, transparent)`}} />
+          
+          <motion.button
+            whileHover={{ scale: 1.1, rotate: 180, boxShadow: `0 0 12px ${project.glowColor}` }}
+            whileTap={{ scale: 0.9 }}
+            onClick={onClose}
+            className="absolute top-3 right-3 z-20 p-2 rounded-full"
+            style={{ border: `1px solid ${project.color}90`, color: project.color, backgroundColor: `rgba(22, 22, 24, 0.7)` }}
+            aria-label="Close modal"
+          >
+            <X size={18} />
+          </motion.button>
+
+          <div className="p-6 sm:p-8 flex-grow overflow-y-auto custom-scrollbar space-y-6 sm:space-y-8">
+            <motion.h2 
+              className="text-3xl sm:text-4xl md:text-[2.75rem] font-bold tracking-tight font-manrope text-center md:text-left" // Centered on small, left on md+
+              style={{ color: project.color, textShadow: `0 0 12px ${project.glowColor}` }}
+              initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.1, duration: 0.4}}
+            >
+              {project.title}
+            </motion.h2>
+
+            <div className="grid md:grid-cols-[1.3fr,1fr] gap-6 sm:gap-8 items-start">
+              <div className="space-y-4 sm:space-y-5 order-2 md:order-1">
+                <motion.p 
+                  className="text-slate-300/90 text-sm sm:text-[0.95rem] leading-relaxed"
+                  initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.15, duration: 0.4}}
+                >
+                  {project.description}
+                </motion.p>
+
+                {project.features && project.features.length > 0 && (
+                  <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.2, duration: 0.4}}>
+                    <h3 className="text-lg sm:text-xl font-semibold mb-2 font-manrope" style={{ color: project.color }}>Key Features</h3>
+                    <ul className="space-y-1.5">
+                      {project.features.map((feature, index) => (
+                        <motion.li
+                          key={index}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.25 + index * 0.04, ease: "circOut", duration: 0.3 }}
+                          className="flex items-start gap-2 text-slate-300/80 text-xs sm:text-sm"
+                        >
+                          <CheckCircle size={14} className="mt-0.5 flex-shrink-0 opacity-80" style={{ color: project.color }} />
+                          <span>{feature}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                )}
+
+                {project.technologies && project.technologies.length > 0 && (
+                <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.3, duration: 0.4}}>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2.5 font-manrope" style={{ color: project.color }}>Technologies</h3>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    {project.technologies.map((tech) => (
+                      <motion.span
+                        key={tech}
+                        whileHover={{ scale: 1.05, y: -1, boxShadow: `0 0 10px ${project.glowColor}`, borderColor: project.color }}
+                        className="px-2.5 py-1 bg-slate-700/60 border rounded text-[11px] sm:text-xs font-roboto-mono text-slate-300/90"
+                        style={{ borderColor: `${project.color}60` }}
+                      >
+                        {tech}
+                      </motion.span>
+                    ))}
+                  </div>
+                </motion.div>
+                )}
+              </div>
+
+              <div className="space-y-4 sm:space-y-5 order-1 md:order-2">
+                <motion.div initial={{opacity:0, scale:0.95}} animate={{opacity:1, scale:1}} transition={{delay:0.2, duration: 0.4}}>
+                  <ModalImageDisplay />
+                </motion.div>
+
+                {project.stats && Object.keys(project.stats).length > 0 && (
+                  <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} transition={{delay:0.35, duration: 0.4}}>
+                    <h3 className="text-lg sm:text-xl font-semibold mb-2.5 font-manrope" style={{ color: project.color }}>Impact & Stats</h3>
+                    <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+                      {Object.entries(project.stats).map(([key, value]) => (
+                        <motion.div
+                          key={key}
+                          whileHover={{ scale: 1.03, y: -1, boxShadow: `0 0 12px ${project.glowColor}`, borderColor: project.color }}
+                          className="p-2 sm:p-2.5 bg-slate-700/60 border rounded-lg text-center"
+                          style={{ borderColor: `${project.color}60` }}
+                        >
+                          <span className="block text-lg sm:text-xl font-bold" style={{color: project.color}}>{value}</span>
+                          <span className="text-[10px] sm:text-xs text-slate-400/90 capitalize font-roboto-mono">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t p-4 sm:p-5 bg-[#131315]/80" style={{borderColor: `${project.color}40`}}>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex gap-2 sm:gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.04, x: -2, boxShadow: `0 0 12px ${project.glowColor}` }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={onPrev}
+                  className="px-3 py-2 bg-slate-700/70 hover:bg-opacity-90 rounded-lg text-slate-300 text-xs sm:text-sm flex items-center gap-1.5 border"
+                  style={{ borderColor: `${project.color}70`, color: project.color}}
+                > <ArrowLeft size={14} /> <span>Prev</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.04, x: 2, boxShadow: `0 0 12px ${project.glowColor}` }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={onNext}
+                  className="px-3 py-2 bg-slate-700/70 hover:bg-opacity-90 rounded-lg text-slate-300 text-xs sm:text-sm flex items-center gap-1.5 border"
+                  style={{ borderColor: `${project.color}70`, color: project.color}}
+                > <span>Next</span> <ArrowRight size={14} />
+                </motion.button>
+              </div>
+
+              <div className="flex gap-2 sm:gap-3">
+                {project.link && project.link !== "#" && (
+                  <motion.a
+                    href={project.link} target="_blank" rel="noopener noreferrer"
+                    whileHover={{ scale: 1.04, opacity: 0.95, boxShadow: `0 0 18px ${project.glowColor}` }}
+                    whileTap={{ scale: 0.96 }}
+                    className="px-4 sm:px-5 py-2 rounded-lg font-semibold text-black text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all duration-300"
+                    style={{ background: `linear-gradient(45deg, ${project.color}, ${project.color}D0)`, color: '#0A0A0A' }} // Darker text for light button
+                  > <ExternalLink size={14} /> <span>Live Demo</span>
+                  </motion.a>
+                )}
+                {project.github && project.github !== "#" && (
+                  <motion.a
+                    href={project.github} target="_blank" rel="noopener noreferrer"
+                    whileHover={{ scale: 1.04, boxShadow: `0 0 18px ${project.glowColor}` }}
+                    whileTap={{ scale: 0.96 }}
+                    className="px-4 sm:px-5 py-2 bg-slate-600/80 hover:bg-opacity-100 rounded-lg font-semibold text-white text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 border"
+                    style={{ borderColor: `${project.color}80`}}
+                  > <Github size={14} /> <span>Source Code</span>
+                  </motion.a>
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      <AnimatePresence>
+        {isFullscreen && <FullscreenImageView />}
+      </AnimatePresence>
+      
+      {/* Inject dynamic scrollbar styles */}
+      <style id="custom-scrollbar-style"></style>
+    </>
+  );
+};
+
+export default ModernProjectModal;
