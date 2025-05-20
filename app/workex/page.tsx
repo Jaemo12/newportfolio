@@ -28,12 +28,12 @@ const workExperienceData: WorkExperience[] = [
     role: "Quality Engineering Lead",
     period: "Feb 2025 - Present",
     description: "Spearheading automated testing initiatives using Selenium and Tosca. Successfully reduced manual testing cycles by 35% and increased test coverage by 30%, significantly improving software reliability and deployment speed.",
-    images: ["/workex/cognixia1.png", "/workex/cognixia2.png", "/workex/cognixia3.png"], // REPLACE
+    images: ["/cognixia1.jpeg", "/cognixia2.webp", "/cognixia3.png"], // REPLACE
     tech: ["Selenium", "Tosca", "Java", "Jira API", "Postman Pro", "Agile", "SQL Server"],
     color: "#D8A38B", // Muted Terracotta/Dusty Rose
     glowColor: "rgba(216, 163, 139, 0.5)", 
-    thumbnail: "/workex/cognixia_thumb.png", // REPLACE
-    heroImage: "/workex/cognixia-hero.jpg", // REPLACE
+    thumbnail: "cognixia1.jpeg", // REPLACE
+    heroImage: "cognixia3.png", // REPLACE
     website: "https://www.cognixia.com",
   },
   {
@@ -46,8 +46,8 @@ const workExperienceData: WorkExperience[] = [
     tech: ["React", "TypeScript", "AWS", "Tailwind CSS", "Node.js", "GPT-3 API"],
     color: "#A3B18A", // Soft Sage Green
     glowColor: "rgba(163, 177, 138, 0.5)",
-    thumbnail: "/workex/timio_thumb.png", // REPLACE
-    heroImage: "/workex/timio-hero.jpg", // REPLACE
+    thumbnail: "/workex/timio1.png", // REPLACE
+    heroImage: "/workex/timio2.jpg", // REPLACE
   },
   {
     id: 3,
@@ -55,12 +55,12 @@ const workExperienceData: WorkExperience[] = [
     role: "Senior Software Engineer",
     period: "Jul 2020 - May 2022",
     description: "Delivered robust full-stack solutions for enterprise clients using React, Angular, and Java Spring Boot. Championed the adoption of Docker and Kubernetes for CI/CD on Azure, enhancing deployment efficiency by over 50%.",
-    images: ["/workex/cognizant1.png", "/workex/cognizant2.png", "/workex/cognizant3.png"], // REPLACE
+    images: ["cognizant.jpg", "/cognizant1.jpg", "/cognizant3.jpg"], // REPLACE
     tech: ["React", "Angular", "Java", "Spring Boot", "Docker", "Kubernetes", "Azure"],
     color: "#B08D57", // Warm Muted Gold/Brown
     glowColor: "rgba(176, 141, 87, 0.5)",
-    thumbnail: "/workex/cognizant_thumb.png", // REPLACE
-    heroImage: "/workex/cognizant-hero.jpg", // REPLACE
+    thumbnail: "/cognizant.jpg", // REPLACE
+    heroImage: "/cognizant1.jpg", // REPLACE
     website: "https://www.cognizant.com",
   }
 ];

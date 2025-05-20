@@ -219,7 +219,7 @@ const AboutSection: React.FC = () => {
               </motion.span>
             ))}
             <br />
-            {Array.from("I'm [Your Name]").map((letter, i) => ( // REPLACE [Your Name]
+            {Array.from("I'm [Amit Samant]").map((letter, i) => ( // REPLACE [Your Name]
               <motion.span key={`n-${i}`} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.3 + i * 0.03, ease: [0.22,1,0.68,1]}}
                 className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[var(--gold-accent)] via-[#FFD700] to-[var(--teal-accent)]"
                 style={{textShadow: `0 0 15px var(--gold-accent)50, 0 0 10px var(--teal-accent)30`}}
