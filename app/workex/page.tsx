@@ -28,7 +28,7 @@ const workExperienceData: WorkExperience[] = [
     role: "Quality Engineering Lead",
     period: "Feb 2025 - Present",
     description: "Spearheading automated testing initiatives using Selenium and Tosca. Successfully reduced manual testing cycles by 35% and increased test coverage by 30%, significantly improving software reliability and deployment speed.",
-    images: ["/cognixia1.jpeg", "/cognixia2.webp", "/cognixia3.png"], // REPLACE
+    images: ["/cognixia1.jpeg", "/cognixia3.png", "/cognixia3.png"], // REPLACE
     tech: ["Selenium", "Tosca", "Java", "Jira API", "Postman Pro", "Agile", "SQL Server"],
     color: "#D8A38B", // Muted Terracotta/Dusty Rose
     glowColor: "rgba(216, 163, 139, 0.5)", 
