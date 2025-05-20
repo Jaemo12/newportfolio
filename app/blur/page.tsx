@@ -1,9 +1,44 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const BlurringText = () => {
+  const containerRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    // Force a reflow after component mounts to ensure the animation starts correctly
+    const triggerAnimation = () => {
+      if (containerRef.current) {
+        const elements = containerRef.current.querySelectorAll('.autoBLur');
+        
+        // Force reflow by accessing offsetHeight
+        elements.forEach(el => {
+          const htmlEl = el as HTMLElement;
+          htmlEl.style.animation = 'none';
+          void htmlEl.offsetHeight; // This triggers reflow
+          htmlEl.style.animation = '';
+        });
+        
+        // Check if elements are in viewport and manually apply animation state
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('animate-in-view');
+            } else {
+              entry.target.classList.remove('animate-in-view');
+            }
+          });
+        }, { threshold: 0.1 });
+        
+        elements.forEach(el => observer.observe(el));
+      }
+    };
+    
+    // Small delay to ensure DOM is fully rendered
+    setTimeout(triggerAnimation, 100);
+  }, []);
+
   return (
-    <main className="blurring-text-container">
+    <main className="blurring-text-container" ref={containerRef}>
       <section className="grid grid-3">
         <div className="autoBLur">CREATOR</div>
         <div className="autoBLur">DESIGNER</div>
@@ -45,6 +80,10 @@ const BlurringText = () => {
             0 0 82px #3498db;
           transform-style: preserve-3d;
           perspective: 1000px;
+          filter: blur(40px);
+          opacity: 0.5;
+          transform: translateZ(-100px);
+          transition: filter 0.8s ease, opacity 0.8s ease, transform 0.8s ease;
         }
         .grid-3 div:nth-child(even) {
           text-align: right;
@@ -55,33 +94,12 @@ const BlurringText = () => {
         .grid-3 div:nth-child(4) {
           grid-column: 1 / 7;
         }
-        .autoBLur {
-          animation: autoBLurAnimation linear both;
-          animation-timeline: view();
+        .autoBLur.animate-in-view {
+          filter: blur(0px);
+          opacity: 1;
+          transform: translateZ(0);
         }
-        @keyframes autoBLurAnimation {
-          0% {
-            filter: blur(40px);
-            opacity: 0.5;
-            transform: translateZ(-100px);
-          }
-          45%, 55% {
-            filter: blur(0px);
-            opacity: 1;
-            transform: translateZ(0);
-            text-shadow: 
-              0 0 7px #fff,
-              0 0 10px #fff,
-              0 0 21px #3498db,
-              0 0 42px #3498db,
-              0 0 82px #3498db;
-          }
-          100% {
-            filter: blur(40px);
-            opacity: 0.5;
-            transform: translateZ(-100px);
-          }
-        }
+        
         @media screen and (max-width: 1023px) {
           .grid-3 {
             font-size: 4em;
