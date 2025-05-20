@@ -11,7 +11,7 @@ import BlurringText from './blur/page';
 import SocialsPage from './social/page';
 import ContactMePage from './contact/page';
 import ArtPortfolio from './art/page';
-import Footer from './components/footer/footer';
+import Footer from './components/footer';
 import LoadingPage from './LoadingPage/page';
 import { SectionTransition } from './components/sectionTransition';
 import ServicesPage from './services/page';
@@ -34,7 +34,7 @@ const HomePage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Your Name | Portfolio</title>
+        <title>Amit Samant | Portfolio</title>
         <meta name="description" content="A showcase of my work and skills" />
       </Head>
       <main className="bg-black text-white">

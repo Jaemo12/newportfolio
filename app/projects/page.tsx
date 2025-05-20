@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image'; 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const MacBookModal = dynamic(() => import('../components/macBookModal/macBookModal'), {
+const MacBookModal = dynamic(() => import('../components/macBookModal'), {
   ssr: false
 });
 

@@ -1,70 +1,87 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring, useInView, Variants } from 'framer-motion';
-import { Github, Linkedin, Code, Mountain, GraduationCap, Palette, ArrowDown } from 'lucide-react';
-import Lottie from 'lottie-react';
+import { motion, useScroll, useTransform, useSpring, useInView, Variants, useMotionValue } from 'framer-motion';
+import { Github, Linkedin, Code, Mountain, GraduationCap, Palette, ArrowDown, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
-// Make sure the path to spaceman.json is correct relative to this file,
-// or import it in a way that Next.js can handle (e.g., if it's in the public folder, use a direct path)
+import dynamic from 'next/dynamic'; // Import next/dynamic
+
+// Dynamically import Lottie with SSR turned off
+const Lottie = dynamic(() => import('lottie-react'), { 
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-slate-800/50 rounded-full animate-pulse"></div> // Optional: Simple placeholder during load
+});
+
 import spaceman from './SpaceMan.json'; 
 
-// --- Configuration & Animation Variants ---
+// --- Animation Variants ---
 
-const FADE_UP_ANIMATION: Variants = {
-  hidden: { opacity: 0, y: 20 },
+const FADE_UP_VARIANT: Variants = {
+  hidden: { opacity: 0, y: 30, filter: 'blur(4px)' },
   visible: (delay: number = 0) => ({
     opacity: 1,
     y: 0,
+    filter: 'blur(0px)',
     transition: {
       delay,
-      duration: 0.6,
-      ease: [0.33, 1, 0.68, 1],
+      duration: 0.8, 
+      ease: [0.22, 1, 0.36, 1], 
     },
   }),
 };
 
-const STAGGER_CHILDREN_ANIMATION: Variants = {
+const STAGGER_PARENT_VARIANT: Variants = {
+  hidden: { opacity: 0 },
   visible: {
+    opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.15, 
+      delayChildren: 0.1, 
     },
   },
 };
 
-// --- Re-styled Skill ---
+// --- Skill Component ---
 interface SkillProps {
   name: string;
-  level: 1 | 2 | 3 | 4 | 5;
+  levelDescription?: string; 
   icon?: React.ReactNode;
+  accentColor?: string; 
 }
 
-const ModernSkill: React.FC<SkillProps> = ({ name, level, icon }) => {
+const ModernSkill: React.FC<SkillProps> = ({ name, levelDescription, icon, accentColor = 'var(--gold-accent)' }) => {
   const ref = useRef<HTMLDivElement>(null);
-  // useInView is client-side, ensure it doesn't run prematurely
-  const isInView = useInView(ref, { once: true, amount: 0.5, margin: "-50px 0px" });
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const isInView = useInView(ref, { once: true, amount: 0.3, margin: "-50px 0px" });
 
   return (
     <motion.div
       ref={ref}
-      className="flex items-center space-x-3 p-3 bg-neutral-800/40 dark:bg-neutral-900/50 rounded-lg border border-neutral-700/60 dark:border-neutral-800/60 shadow-md"
+      className="flex flex-col items-start p-4 sm:p-5 bg-slate-800/50 dark:bg-slate-900/70 rounded-xl border border-slate-700/80 dark:border-slate-800/80 shadow-lg transition-all duration-300 ease-out"
       initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      variants={FADE_UP_ANIMATION}
-      custom={0.1} // Small delay for individual skill items
+      animate={isMounted && isInView ? "visible" : "hidden"}
+      variants={FADE_UP_VARIANT}
+      custom={0.1} 
+      whileHover={{ 
+        y: -4, 
+        scale: 1.02, 
+        borderColor: accentColor, 
+        boxShadow: `0 0 20px -5px ${accentColor}60, 0 0 10px -7px ${accentColor}40` 
+      }}
+      style={{ '--current-accent': accentColor } as React.CSSProperties}
     >
-      {icon && <span className="text-[var(--neon-blue)] opacity-80">{icon}</span>}
-      <span className="text-neutral-300 dark:text-neutral-200 flex-grow text-sm sm:text-base">{name}</span>
-      <div className="flex space-x-1">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <span
-            key={i}
-            className={`h-2 w-2.5 sm:w-3 rounded-full ${
-              i < level ? 'bg-[var(--neon-blue)]' : 'bg-neutral-600 dark:bg-neutral-700'
-            } transition-colors duration-300`}
-          />
-        ))}
+      <div className="flex items-center mb-2.5">
+        {icon && <span className="text-[var(--current-accent)] mr-2.5 opacity-90">{React.cloneElement(icon as React.ReactElement, { size: 20 })}</span>}
+        <span className="text-slate-100 dark:text-slate-50 text-base sm:text-lg font-semibold font-manrope">{name}</span>
       </div>
+      {levelDescription && (
+         <p className="text-slate-400 dark:text-slate-500 text-xs sm:text-sm font-inter">{levelDescription}</p>
+      )}
     </motion.div>
   );
 };
@@ -72,356 +89,318 @@ const ModernSkill: React.FC<SkillProps> = ({ name, level, icon }) => {
 
 // --- Main AboutSection Component ---
 const AboutSection: React.FC = () => {
-  const [isClient, setIsClient] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setIsMounted(true);
   }, []);
 
   const heroRef = useRef<HTMLDivElement>(null);
-  // Conditionally initialize hooks or pass empty/default values if not client-side yet
-  const { scrollYProgress: heroScrollYProgress } = useScroll(
-    isClient ? { target: heroRef, offset: ['start start', 'end start'] } : {}
+  const bioSectionRef = useRef<HTMLDivElement>(null); 
+  const skillsSectionRef = useRef<HTMLDivElement>(null);
+  const educationSectionRef = useRef<HTMLDivElement>(null);
+
+
+  const defaultScrollYProgress = useMotionValue(0);
+
+  const { scrollYProgress: heroScrollYProgressServer } = useScroll(
+    isMounted && heroRef.current ? { target: heroRef, offset: ['start start', 'end start'] } : {}
   );
+  const heroScrollYProgress = isMounted && heroRef.current ? heroScrollYProgressServer : defaultScrollYProgress;
   
-  const heroTextOpacity = useTransform(heroScrollYProgress || motion.div, [0, 0.5, 0.8], [1, 1, 0]);
-  const heroTextY = useTransform(heroScrollYProgress || motion.div, [0, 0.8], ['0%', '-50%']);
-  const lottieScale = useTransform(heroScrollYProgress || motion.div, [0, 0.8], [1, 0.5]);
-  const lottieY = useTransform(heroScrollYProgress || motion.div, [0, 0.8], ['0%', '50%']);
-
-  const bioImageRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: bioImageScrollYProgress } = useScroll(
-    isClient ? { target: bioImageRef, offset: ['start end', 'end start'] } : {}
-  );
-
-  const bioImageScale = useTransform(bioImageScrollYProgress || motion.div, [0, 0.5, 1], [0.9, 1, 0.9]); // Start slightly smaller
-  const bioImageOpacity = useTransform(bioImageScrollYProgress || motion.div, [0, 0.15, 0.85, 1], [0, 1, 1, 0]); // Adjusted fade points
+  const heroTextYSpring = useSpring(useTransform(heroScrollYProgress, [0, 0.8], ['0%', '-70%']), { stiffness: 100, damping: 30, restDelta: 0.001 });
+  const heroTextOpacity = useTransform(heroScrollYProgress, [0, 0.5, 0.85], [1, 1, 0]);
+  
+  const lottieScaleSpring = useSpring(useTransform(heroScrollYProgress, [0, 0.8], [1, 0.2]), { stiffness: 100, damping: 30 });
+  const lottieYSpring = useSpring(useTransform(heroScrollYProgress, [0, 0.8], ['0%', '80%']), { stiffness: 100, damping: 30 });
+  const lottieOpacity = useTransform(heroScrollYProgress, [0, 0.65, 0.9], [0.9, 0.9, 0]);
 
 
   // Data
   const skills: SkillProps[] = [
-    { name: 'Next.js / React', level: 5, icon: <Code size={16} className="opacity-70"/> },
-    { name: 'TypeScript', level: 4, icon: <Code size={16} className="opacity-70"/> },
-    { name: 'UI/UX Design (Figma)', level: 4, icon: <Palette size={16} className="opacity-70"/> },
-    { name: 'Node.js & Backend', level: 3, icon: <Code size={16} className="opacity-70"/> },
+    { name: 'Next.js & React Ecosystem', levelDescription: "Advanced proficiency, building scalable SPAs & SSR apps.", icon: <Code />, accentColor: 'var(--gold-accent)' },
+    { name: 'TypeScript & JavaScript (ESNext)', levelDescription: "Strong expertise in modern JS and static typing.", icon: <Code />, accentColor: 'var(--teal-accent)' },
+    { name: 'UI/UX Design & Prototyping', levelDescription: "Figma, Adobe XD. User-centered design principles.", icon: <Palette />, accentColor: 'var(--gold-accent)' },
+    { name: 'Node.js, Express & NestJS', levelDescription: "Building robust RESTful & GraphQL APIs.", icon: <Code />, accentColor: 'var(--teal-accent)' },
+    { name: 'Databases (SQL & NoSQL)', levelDescription: "PostgreSQL, MongoDB, Firebase.", icon: <Code />, accentColor: 'var(--gold-accent)' },
+    { name: 'Cloud & DevOps (AWS, Docker)', levelDescription: "CI/CD, Serverless, Containerization.", icon: <Mountain />, accentColor: 'var(--teal-accent)' },
   ];
 
   const educationItems = [
     {
-      icon: <GraduationCap size={22} className="text-[var(--neon-blue)]" />,
-      title: "Master's Degree",
-      subtitle: 'Texas A&M University Corpus Christi',
+      icon: <GraduationCap size={24} style={{color: 'var(--gold-accent)'}}/>,
+      title: "Master's in Artificial Intelligence",
+      subtitle: 'Texas A&M University, Corpus Christi',
       period: '2022 - 2024',
-      description: 'Specialized in advanced topics and research relevant to my field of study, focusing on AI and distributed systems.',
-      accentColor: 'var(--neon-blue)',
-      hoverBorderColorClass: 'group-hover:border-[var(--neon-blue)]/70', // For Tailwind group hover
+      description: 'Deep dived into advanced AI, machine learning, and distributed systems, culminating in a significant research project on Natural Language Processing applications.',
+      accentColor: 'var(--gold-accent)',
     },
     {
-      icon: <GraduationCap size={22} className="text-[var(--neon-pink)]" />,
-      title: "Bachelor's Degree",
-      subtitle: 'DIT University',
+      icon: <GraduationCap size={24} style={{color: 'var(--teal-accent)'}}/>,
+      title: "Bachelor's in Computer Science",
+      subtitle: 'DIT University, India',
       period: '2016 - 2020',
-      description: 'Gained a comprehensive foundation in computer science principles and modern software development practices.',
-      accentColor: 'var(--neon-pink)',
-      hoverBorderColorClass: 'group-hover:border-[var(--neon-pink)]/70',
+      description: 'Established a comprehensive foundation in core computer science principles, data structures, algorithms, and modern software engineering methodologies.',
+      accentColor: 'var(--teal-accent)',
     },
   ];
 
-  // If not on client yet, you can return a loader or null to prevent errors
-  if (!isClient) {
-    return ( // Optional: Basic skeleton or loader
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <p className="text-neutral-400">Loading About Section...</p>
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col">
+        <section className="h-screen flex items-center justify-center">
+             <p className="text-slate-400 text-xl">Loading About Me...</p>
+        </section>
+        <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-slate-900">
+            <p className="text-slate-400 text-xl text-center">Loading content...</p>
+        </section>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-950 text-neutral-300 font-inter antialiased">
+    <div className="bg-slate-950 text-slate-200 font-inter antialiased">
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
-          --neon-blue: #00f3ff;
-          --neon-pink: #ff00e5;
-          --neon-purple: #9d00ff; 
+          --gold-accent: #FFC300; 
+          --teal-accent: #4FD1C5; 
           --font-body: 'Inter', sans-serif;
-          --font-heading: 'Figtree', sans-serif; /* Using Figtree for headings */
+          --font-heading-display: 'Manrope', sans-serif;
+          --font-heading-section: 'Manrope', sans-serif;
+          --slate-700-grid: #334155; 
         }
 
         body {
           font-family: var(--font-body);
-          background-color: #0A0F1E; /* Darker base for body if this page is standalone */
-          color: #E2E8F0; /* Default light text */
+          background-color: #0D1B2A; 
+          color: #E0E7FF; 
         }
 
-        .font-figtree {
-          font-family: var(--font-heading);
-        }
+        .font-manrope { font-family: var(--font-heading-section); }
+        .font-manrope-display { font-family: var(--font-heading-display); }
         
-        /* Custom scrollbar for a more integrated feel */
-        ::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; } 
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; } 
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; } 
+        * { scrollbar-width: thin; scrollbar-color: #475569 #1e293b; }
+        
+        @keyframes subtleGridPulse {
+          0%, 100% { opacity: 0.02; transform: scale(1); }
+          50% { opacity: 0.04; transform: scale(1.01); }
         }
-        ::-webkit-scrollbar-track {
-          background: #1E293B; /* slate-800 */
-        }
-        ::-webkit-scrollbar-thumb {
-          background: #475569; /* slate-600 */
-          border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: #64748B; /* slate-500 */
-        }
-        /* For Firefox */
-        * {
-          scrollbar-width: thin;
-          scrollbar-color: #475569 #1E293B;
+        .animate-subtle-grid-pulse {
+          animation: subtleGridPulse 10s ease-in-out infinite;
         }
       `}</style>
 
       {/* Section 1: Hero */}
       <section ref={heroRef} className="min-h-screen h-screen flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden">
-        {/* Subtle animated grid pattern */}
-        <div className="absolute inset-0 z-0 opacity-[0.03] 
-          bg-[linear-gradient(to_right,theme(colors.slate.700)_1px,transparent_1px),linear-gradient(to_bottom,theme(colors.slate.700)_1px,transparent_1px)] 
-          bg-[size:40px_40px] 
-          animate-[gridPulse_8s_ease-in-out_infinite]"
+        <div className="absolute inset-0 z-0 opacity-[0.02] 
+          bg-[linear-gradient(to_right,var(--slate-700-grid)_0.5px,transparent_0.5px),linear-gradient(to_bottom,var(--slate-700-grid)_0.5px,transparent_0.5px)] 
+          bg-[size:30px_30px] 
+          animate-subtle-grid-pulse" 
         />
-        <style jsx>{`
-          @keyframes gridPulse {
-            0%, 100% { opacity: 0.03; transform: scale(1); }
-            50% { opacity: 0.05; transform: scale(1.02); }
-          }
-        `}</style>
-
 
         <motion.div
-          style={{ opacity: heroTextOpacity, y: heroTextY }}
-          className="text-center z-10"
+          style={{ opacity: heroTextOpacity, y: heroTextYSpring }}
+          className="text-center z-10 relative"
         >
           <motion.h1
-            className="font-figtree text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-extrabold tracking-tighter mb-5 sm:mb-6"
-            initial={{ opacity:0, y: 25 }}
-            animate={{ opacity:1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: "circOut" }}
+            variants={FADE_UP_VARIANT} initial="hidden" animate="visible" custom={0}
+            className="font-manrope-display text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] font-extrabold tracking-tighter mb-4 sm:mb-5"
           >
-            {/* Using AnimatedText for character stagger */}
             {Array.from("Hello,").map((letter, i) => (
-              <motion.span key={`h-${i}`} variants={FADE_UP_ANIMATION} custom={i * 0.025} className="inline-block">
+              <motion.span key={`h-${i}`} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 + i * 0.03, ease: [0.22,1,0.68,1]}} className="inline-block text-slate-100">
                 {letter}
               </motion.span>
             ))}
             <br />
             {Array.from("I'm [Your Name]").map((letter, i) => ( // REPLACE [Your Name]
-              <motion.span 
-                key={`n-${i}`} 
-                variants={FADE_UP_ANIMATION} 
-                custom={0.25 + i * 0.025} 
-                className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[var(--neon-blue)] to-[var(--neon-pink)]"
-                style={{textShadow: `0 0 10px var(--neon-blue), 0 0 10px var(--neon-pink)`}} // Added text shadow for pop
+              <motion.span key={`n-${i}`} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.3 + i * 0.03, ease: [0.22,1,0.68,1]}}
+                className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[var(--gold-accent)] via-[#FFD700] to-[var(--teal-accent)]"
+                style={{textShadow: `0 0 15px var(--gold-accent)50, 0 0 10px var(--teal-accent)30`}}
               >
                 {letter === " " ? "\u00A0" : letter}
               </motion.span>
             ))}
           </motion.h1>
           <motion.p
-            className="text-neutral-400 dark:text-neutral-300 text-base sm:text-lg md:text-xl max-w-xl mx-auto mb-8 sm:mb-10"
-            initial={{ opacity:0, y: 20 }}
-            animate={{ opacity:1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.5, ease: "circOut" }}
+            variants={FADE_UP_VARIANT} initial="hidden" animate="visible" custom={0.5} 
+            className="text-slate-300 text-base sm:text-lg md:text-xl max-w-xl mx-auto mb-8 sm:mb-10 font-light"
           >
-            Digital craftsman, creative full-stack developer & problem solver.
-            <br />
-            Welcome to my digital playground.
+            A creative Full-Stack Developer & UI/UX enthusiast, turning complex ideas into elegant digital experiences.
           </motion.p>
         </motion.div>
 
-        <motion.div
-          className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 absolute bottom-[12vh] sm:bottom-[10vh] z-0 opacity-80" // Adjusted size and opacity
-          style={{ scale: lottieScale, y: lottieY, opacity: heroTextOpacity }} // Link opacity to text for smoother fade with scroll
-        >
-          {spaceman && <Lottie animationData={spaceman} loop={true} />}
-        </motion.div>
+        {/* Conditionally render Lottie only on client and if spaceman data is available */}
+        {isMounted && spaceman && (
+          <motion.div
+            className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 absolute bottom-[12vh] sm:bottom-[10vh] left-1/2 -translate-x-1/2 z-0"
+            style={{ scale: lottieScaleSpring, y: lottieYSpring, opacity: lottieOpacity }}
+          >
+            <Lottie animationData={spaceman} loop={true} />
+          </motion.div>
+        )}
 
         <motion.div
-            className="absolute bottom-8 sm:bottom-10 left-1/2 transform -translate-x-1/2 text-neutral-500 dark:text-neutral-600"
+            className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-slate-500"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
+            animate={{ opacity: 1, y: [0, 8, 0] }}
+            transition={{ 
+                opacity: {delay: 1.0, duration: 0.8, ease: "circOut" },
+                y: {duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 1.2} // y transition for bounce
+            }}
         >
-          <ArrowDown size={20} className="animate-bounce"/>
+          <ArrowDown size={20} className="opacity-60"/>
         </motion.div>
       </section>
 
       {/* Section 2: Bio / Who I Am */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-slate-900 dark:bg-gray-950 relative">
-        <div className="absolute -top-16 -left-16 w-60 h-60 sm:w-72 sm:h-72 bg-[var(--neon-blue)]/5 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
-        <div className="absolute -bottom-16 -right-16 w-60 h-60 sm:w-72 sm:h-72 bg-[var(--neon-pink)]/5 rounded-full blur-3xl opacity-30 pointer-events-none"></div>
+      <section ref={bioSectionRef} className="py-20 md:py-32 px-4 sm:px-6 lg:px-8 bg-slate-900/70 dark:bg-gray-950/70 backdrop-blur-sm relative">
+        <div className="absolute inset-0 -z-10 opacity-5">
+            <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-gradient-to-br from-[var(--gold-accent)]/20 to-transparent blur-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-gradient-to-tl from-[var(--teal-accent)]/20 to-transparent blur-3xl"></div>
+        </div>
         
-        <div className="max-w-5xl mx-auto grid md:grid-cols-5 gap-10 sm:gap-12 items-center">
+        <motion.div 
+          className="max-w-5xl xl:max-w-6xl mx-auto grid md:grid-cols-2 gap-10 sm:gap-16 items-center"
+          initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={STAGGER_PARENT_VARIANT}
+        >
           <motion.div
-            ref={bioImageRef}
-            className="md:col-span-2 relative group aspect-[3/4] sm:aspect-square md:aspect-[3/4] rounded-xl overflow-hidden border border-neutral-700/50 dark:border-neutral-800/50 shadow-xl"
-            style={{ scale: bioImageScale, opacity: bioImageOpacity }}
-            whileHover={{ scale: bioImageScale ? 1.02 : 1, transition: {duration: 0.3} }} // Apply hover only if scale is active
+            variants={FADE_UP_VARIANT}
+            className="relative group aspect-square md:aspect-[4/5] rounded-2xl overflow-hidden shadow-xl order-1 md:order-none"
+            whileHover={{ scale: 1.02, transition: {duration:0.3} }}
           >
-            {/* Ensure hero.jpeg is in your public folder */}
-            <Image
-              src="/hero.jpeg" 
-              alt="Profile Picture"
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 40vw, 33vw"
-              className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
+            {isMounted && ( // Conditionally render Image
+              <Image
+                src="/hero.jpeg" alt="Amit Samant - Profile" fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover transition-transform duration-400 ease-out group-hover:scale-105"
+                priority
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-slate-900/10 group-hover:from-slate-900/30 transition-opacity duration-300"></div>
+            <motion.div 
+                className="absolute inset-0 rounded-2xl border-2 border-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{borderColor: 'var(--gold-accent)', boxShadow: `0 0 20px var(--gold-accent)70, inset 0 0 15px var(--gold-accent)40`}}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20"></div>
           </motion.div>
 
-          <motion.div
-            className="md:col-span-3"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }} // Trigger when 20% visible
-            variants={STAGGER_CHILDREN_ANIMATION}
-          >
-            <motion.h2 
-              variants={FADE_UP_ANIMATION} 
-              className="font-figtree text-3xl sm:text-4xl font-bold mb-5 sm:mb-6 text-neutral-100 dark:text-white cursor-default"
-              whileHover={{
-                scale: 1.01,
-                textShadow: "0 0 12px var(--neon-blue), 0 0 18px rgba(0, 243, 255, 0.25)",
-                transition: { duration: 0.25 }
-              }}
+          <motion.div variants={STAGGER_PARENT_VARIANT} className="space-y-5 sm:space-y-6">
+            <motion.h2 variants={FADE_UP_VARIANT} className="font-manrope-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-50"
+              style={{textShadow: `0 0 10px var(--gold-accent)30`}}
             >
               A Bit About Me
             </motion.h2>
-            <motion.p variants={FADE_UP_ANIMATION} custom={0.1} className="text-base sm:text-lg leading-relaxed text-neutral-400 dark:text-neutral-300 mb-4">
-              I'm a passionate developer with roots in the Himalayas and wings that have taken me across continents. My journey in technology is fueled by curiosity and creativity, blending technical expertise with an artistic vision.
+            <motion.p variants={FADE_UP_VARIANT} className="text-base sm:text-lg leading-relaxed text-slate-300 dark:text-slate-200">
+              Im a passionate developer with roots in the Himalayas and wings that have taken me across continents. My journey in technology is fueled by curiosity and creativity, blending technical expertise with an artistic vision.
             </motion.p>
-            <motion.p variants={FADE_UP_ANIMATION} custom={0.2} className="text-base sm:text-lg leading-relaxed text-neutral-400 dark:text-neutral-300 mb-6 sm:mb-8">
-              I approach problems from unique perspectives, always striving to craft elegant and effective digital solutions. Whether it's intricate code or intuitive design, I find joy in the process of creation.
+            <motion.p variants={FADE_UP_VARIANT} className="text-base sm:text-lg leading-relaxed text-slate-300 dark:text-slate-200">
+              I approach problems from unique perspectives, always striving to craft elegant and effective digital solutions. Whether it&apos;s intricate code or intuitive design, I find joy in the process of creation.
             </motion.p>
-            <motion.div variants={FADE_UP_ANIMATION} custom={0.3} className="flex flex-wrap gap-3 sm:gap-4">
+            <motion.div variants={FADE_UP_VARIANT} className="flex flex-wrap gap-3 sm:gap-4 pt-2">
               {[
-                { href: "https://github.com/Jaemo12", icon: <Github />, label: "GitHub", color: "var(--neon-blue)", glowColor: "rgba(0, 243, 255, 0.4)" }, // Example: Replace # with actual links
-                { href: "https://linkedin.com/in/amitsamant12", icon: <Linkedin />, label: "LinkedIn", color: "var(--neon-pink)", glowColor: "rgba(255, 0, 229, 0.4)" },
+                { href: "https://github.com/Jaemo12", icon: <Github />, label: "GitHub", color: "var(--gold-accent)"},
+                { href: "https://linkedin.com/in/amitsamant12", icon: <Linkedin />, label: "LinkedIn", color: "var(--teal-accent)"},
               ].map(item => (
                 <motion.a
-                  key={item.label}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg text-neutral-100 bg-neutral-800/70 dark:bg-neutral-900/70 hover:bg-neutral-700/90 dark:hover:bg-neutral-800/90 transition-all duration-300 ease-out group"
-                  style={{'--item-color': item.color, '--item-glow': item.glowColor} as React.CSSProperties}
-                  whileHover={{ y: -2, scale: 1.03, borderColor: 'var(--item-color)', boxShadow: `0 0 15px -3px var(--item-glow), 0 0 8px -4px var(--item-color)`}}
-                  whileTap={{scale: 0.98}}
+                  key={item.label} href={item.href} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2.5 border text-sm font-semibold rounded-lg text-slate-100 transition-all duration-300 ease-out group"
+                  style={{borderColor: `${item.color}50`, background: `${item.color}10`}}
+                  whileHover={{ y: -3, scale: 1.04, borderColor: item.color, background: `${item.color}20`, boxShadow: `0 0 15px -2px ${item.color}70`}}
+                  whileTap={{scale: 0.97}}
                 >
-                  {React.cloneElement(item.icon as React.ReactElement, { size: 18, className: "mr-2 opacity-80 group-hover:opacity-100 transition-opacity", style: {color: 'var(--item-color)'} })}
+                  {React.cloneElement(item.icon as React.ReactElement, { size: 18, className: "mr-2 opacity-80 group-hover:opacity-100 transition-opacity", style: {color: item.color} })}
                   <span className="group-hover:text-white transition-colors">{item.label}</span>
                 </motion.a>
               ))}
             </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Section 3: Skills */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-gray-950 dark:bg-black"> {/* Alternating background */}
-        <div className="max-w-3xl mx-auto"> {/* Slightly narrower for focus */}
-          <motion.h2
-            className="font-figtree text-3xl sm:text-4xl font-bold text-center mb-12 sm:mb-16 text-neutral-100 dark:text-white cursor-default"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={FADE_UP_ANIMATION}
-            whileHover={{
-              scale: 1.01,
-              textShadow: "0 0 12px var(--neon-purple), 0 0 18px rgba(157, 0, 255, 0.25)",
-              transition: { duration: 0.25 }
-            }}
+      <section ref={skillsSectionRef} className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-slate-950 dark:bg-black">
+        <motion.div 
+          className="max-w-4xl mx-auto" 
+          initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.1 }} variants={STAGGER_PARENT_VARIANT}
+        >
+          <motion.h2 variants={FADE_UP_VARIANT}
+            className="font-manrope-display text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-12 sm:mb-16 text-slate-50"
+            style={{textShadow: `0 0 10px var(--teal-accent)30`}}
           >
             My Core Competencies
           </motion.h2>
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.1 }} // Trigger earlier for grid
-            variants={STAGGER_CHILDREN_ANIMATION}
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6" 
+            variants={STAGGER_PARENT_VARIANT}
           >
-            {skills.map((skill, idx) => (
-              // ModernSkill already uses FADE_UP_ANIMATION internally
+            {skills.map((skill) => (
               <ModernSkill key={skill.name} {...skill} />
             ))}
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Section 4: Education */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-slate-900 dark:bg-gray-950 relative overflow-hidden">
-         <div className="absolute -bottom-20 -left-20 w-64 h-64 sm:w-80 sm:h-80 bg-[var(--neon-blue)]/5 rounded-full blur-3xl opacity-30 pointer-events-none transform rotate-45"></div>
-         <div className="absolute -top-20 -right-20 w-64 h-64 sm:w-80 sm:h-80 bg-[var(--neon-pink)]/5 rounded-full blur-3xl opacity-25 pointer-events-none transform -rotate-45"></div>
+      <section ref={educationSectionRef} className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-slate-900 dark:bg-gray-950 relative overflow-hidden">
+         <div className="absolute -bottom-24 -left-24 w-80 h-80 sm:w-96 sm:h-96 bg-[var(--gold-accent)]/5 rounded-full blur-3xl opacity-30 pointer-events-none transform rotate-12"></div>
+         <div className="absolute -top-24 -right-24 w-80 h-80 sm:w-96 sm:h-96 bg-[var(--teal-accent)]/5 rounded-full blur-3xl opacity-25 pointer-events-none transform -rotate-12"></div>
 
-        <div className="max-w-4xl mx-auto"> {/* Wider for timeline */}
-          <motion.h2
-            className="font-figtree text-3xl sm:text-4xl font-bold text-center mb-12 sm:mb-16 text-neutral-100 dark:text-white cursor-default"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={FADE_UP_ANIMATION}
-            whileHover={{
-              scale: 1.01,
-              textShadow: "0 0 12px var(--neon-blue), 0 0 18px rgba(0, 243, 255, 0.25)",
-              transition: { duration: 0.25 }
-            }}
+        <motion.div 
+          className="max-w-4xl mx-auto"
+          initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.05 }} variants={STAGGER_PARENT_VARIANT}
+        >
+          <motion.h2 variants={FADE_UP_VARIANT}
+            className="font-manrope-display text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-12 sm:mb-16 text-slate-50"
+             style={{textShadow: `0 0 10px var(--gold-accent)30`}}
           >
-            Education
+            Education & Milestones
           </motion.h2>
-          <div className="relative space-y-10 md:space-y-0"> {/* Space for mobile, timeline for md+ */}
-            {/* Central timeline bar for medium screens and up */}
-            <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-0.5 bg-neutral-700/50 dark:bg-neutral-800/50 transform -translate-x-1/2 rounded-full"></div>
+          <div className="relative space-y-10 md:space-y-0">
+            <div className="hidden md:block absolute top-0 bottom-0 left-1/2 w-0.5 bg-slate-700/70 dark:bg-slate-800/70 transform -translate-x-1/2 rounded-full"></div>
             
             {educationItems.map((item, index) => (
               <motion.div
                 key={item.title + index}
-                className="md:flex md:items-center w-full group relative" // Added relative for dot positioning
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
-                variants={FADE_UP_ANIMATION}
-                custom={index * 0.15} // Stagger delay for education items
+                className="md:flex md:items-start w-full group relative" 
+                variants={FADE_UP_VARIANT} 
               >
-                {/* Timeline Dot for medium screens and up */}
-                <div className={`hidden md:flex absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full ring-4 ring-slate-900 dark:ring-gray-950 z-10 transition-all duration-300 group-hover:scale-110
-                  ${index % 2 === 0 ? 'left-1/2 -translate-x-[calc(50%+0.5px)]' : 'left-1/2 -translate-x-[calc(50%-0.5px)]' }`} // Precise centering on the line
-                  style={{ backgroundColor: item.accentColor, boxShadow: `0 0 10px ${item.accentColor}80`}}
-                ></div>
+                <div className={`hidden md:flex absolute top-0 w-5 h-5 rounded-full ring-4 ring-slate-900 dark:ring-gray-950 z-10 transition-all duration-300 group-hover:scale-110 items-center justify-center
+                  ${index % 2 === 0 ? 'left-1/2 -translate-x-[calc(50%+2px)] md:mt-1' : 'left-1/2 -translate-x-[calc(50%-2px)] md:mt-1' }`}
+                  style={{ backgroundColor: item.accentColor, boxShadow: `0 0 12px ${item.accentColor}99`}}
+                >
+                   <div className="w-2 h-2 bg-slate-900 dark:bg-gray-950 rounded-full"></div>
+                </div>
 
-                {/* Card Content */}
-                <div className={`w-full md:w-[calc(50%-1rem)] p-1 ${index % 2 === 0 ? 'md:ml-auto md:text-right' : 'md:mr-auto md:text-left'}`}>
+                <div className={`w-full md:w-[calc(50%-2.5rem)] p-1 ${index % 2 === 0 ? 'md:ml-auto md:pl-10 text-right' : 'md:mr-auto md:pr-10 text-left'}`}>
                   <motion.div 
-                    className="p-5 sm:p-6 bg-neutral-800/60 dark:bg-neutral-900/60 rounded-xl border border-neutral-700/70 dark:border-neutral-800/70 shadow-lg transition-all duration-300 ease-out"
-                    style={{'--item-color': item.accentColor, '--item-glow': item.accentColor.replace('var(','').replace(')','').includes('blue') ? 'rgba(0,243,255,0.4)' : 'rgba(255,0,229,0.4)'} as React.CSSProperties}
+                    className="p-5 sm:p-6 bg-slate-800/70 dark:bg-slate-900/70 rounded-2xl border border-slate-700/80 dark:border-slate-800/80 shadow-xl transition-all duration-300 ease-out"
+                    style={{'--item-accent': item.accentColor} as React.CSSProperties}
                     whileHover={{
-                        y: -4,
-                        borderColor: 'var(--item-color)',
-                        boxShadow: `0 0 20px -3px var(--item-glow), 0 5px 15px -7px var(--item-color)`
+                        y: -5,
+                        scale: 1.015,
+                        borderColor: 'var(--item-accent)',
+                        boxShadow: `0 0 28px -6px ${item.accentColor.replace('var(','').replace(')','')}50, 0 10px 20px -10px ${item.accentColor.replace('var(','').replace(')','')}30`
                     }}
                   >
-                    <div className={`flex items-center gap-3 mb-2 sm:mb-2.5 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
+                    <div className={`flex items-center gap-3 mb-2 sm:mb-2.5 ${index % 2 === 0 ? 'md:flex-row-reverse ' : ''} ${index % 2 === 0 ? 'md:justify-end' : 'md:justify-start'}`}>
                       {item.icon}
-                      <h3 className="font-figtree text-lg sm:text-xl font-semibold text-neutral-100 dark:text-white">{item.title}</h3>
+                      <h3 className="font-manrope text-lg sm:text-xl font-semibold text-slate-100 dark:text-white">{item.title}</h3>
                     </div>
                     <p className="text-xs sm:text-sm mb-1 sm:mb-1.5 font-mono" style={{color: item.accentColor}}>{item.period}</p>
-                    <p className="text-neutral-400 dark:text-neutral-300 text-sm sm:text-[0.9rem] mb-2">{item.subtitle}</p>
-                    <p className="text-neutral-500 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed">{item.description}</p>
+                    <p className="text-slate-300 dark:text-slate-200 text-sm sm:text-[0.9rem] mb-2">{item.subtitle}</p>
+                    <p className="text-slate-400 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">{item.description}</p>
                   </motion.div>
                 </div>
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );

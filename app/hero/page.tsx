@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
-const NeonTitle = dynamic(() => import('../components/neonTitle/neonTitle'), {
+const NeonTitle = dynamic(() => import('../components/neonTitle'), {
   ssr: false,
   loading: () => <div className="w-full h-48 flex items-center justify-center"><p className="text-3xl text-center text-white/30">Loading Title...</p></div>, 
 });
