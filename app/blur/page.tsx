@@ -2,38 +2,52 @@
 import React, { useState, useEffect } from 'react';
 
 const BlurringText = () => {
-  // State to track which items are visible
-  const [textItems, setTextItems] = useState({
-    item0: false,
-    item1: false,
-    item2: false,
-    item3: false
-  });
-
-  // Effect to handle animation timing on component mount
+  // Use state to track whether the component has been scrolled to
+  const [inView, setInView] = useState(false);
+  
   useEffect(() => {
-    // Make each item visible with a staggered delay
-    const timer1 = setTimeout(() => setTextItems(prev => ({ ...prev, item0: true })), 500);
-    const timer2 = setTimeout(() => setTextItems(prev => ({ ...prev, item1: true })), 800);
-    const timer3 = setTimeout(() => setTextItems(prev => ({ ...prev, item2: true })), 1100);
-    const timer4 = setTimeout(() => setTextItems(prev => ({ ...prev, item3: true })), 1400);
+    // Function to check if element is in viewport
+    const isInViewport = (el) => {
+      const rect = el.getBoundingClientRect();
+      return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+      );
+    };
     
-    // Clean up timers
+    // Function to handle scroll events
+    const handleScroll = () => {
+      const container = document.querySelector('.blurring-text-container');
+      if (container && isInViewport(container)) {
+        setInView(true);
+        // Once in view, remove the scroll listener
+        window.removeEventListener('scroll', handleScroll);
+      }
+    };
+    
+    // Check initial state
+    setTimeout(() => {
+      handleScroll();
+    }, 100);
+    
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll);
+    
+    // Clean up
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
   return (
     <main className="blurring-text-container">
       <section className="grid grid-3">
-        <div className={`text-item ${textItems.item0 ? 'visible' : 'blurred'}`}>CREATOR</div>
-        <div className={`text-item ${textItems.item1 ? 'visible' : 'blurred'}`}>DESIGNER</div>
-        <div className={`text-item ${textItems.item2 ? 'visible' : 'blurred'}`}>DEVELOPER</div>
-        <div className={`text-item ${textItems.item3 ? 'visible' : 'blurred'}`}>ARTIST</div>
+        <div className={`text-item ${inView ? 'visible' : 'blurred'}`}>CREATOR</div>
+        <div className={`text-item ${inView ? 'visible' : 'blurred'}`}>DESIGNER</div>
+        <div className={`text-item ${inView ? 'visible' : 'blurred'}`}>DEVELOPER</div>
+        <div className={`text-item ${inView ? 'visible' : 'blurred'}`}>ARTIST</div>
       </section>
       <style jsx>{`
         @import url('https://fonts.googleapis.com/css2?family=Rock+3D&display=swap');
@@ -78,24 +92,25 @@ const BlurringText = () => {
           grid-column: 1 / 7;
         }
         
-        /* Blurred state */
+        /* Blurred state - make sure this is very blurry */
         .text-item.blurred {
-          filter: blur(40px);
-          opacity: 0.5;
-          transform: translateZ(-100px);
+          filter: blur(40px) !important;
+          opacity: 0.5 !important;
+          transform: translateZ(-100px) !important;
+          text-shadow: none !important;
         }
         
-        /* Visible state */
+        /* Visible state with transition */
         .text-item.visible {
-          filter: blur(0);
-          opacity: 1;
-          transform: translateZ(0);
+          filter: blur(0) !important;
+          opacity: 1 !important;
+          transform: translateZ(0) !important;
           text-shadow: 
             0 0 7px #fff,
             0 0 10px #fff,
             0 0 21px #3498db,
             0 0 42px #3498db,
-            0 0 82px #3498db;
+            0 0 82px #3498db !important;
         }
         
         @media screen and (max-width: 1023px) {
