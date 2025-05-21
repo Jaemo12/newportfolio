@@ -2,56 +2,24 @@
 import React, { useState, useEffect } from 'react';
 
 const BlurringText = () => {
-  // Use state to track whether the component has been scrolled to
-  const [inView, setInView] = useState(false);
-  
-  useEffect(() => {
-    // Function to check if element is in viewport
-    interface InViewportElement extends Element {
-      getBoundingClientRect: () => DOMRect;
-    }
+  const [isVisible, setIsVisible] = useState(false);
 
-    const isInViewport = (el: InViewportElement): boolean => {
-      const rect = el.getBoundingClientRect();
-      return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-      );
-    };
-    
-    // Function to handle scroll events
-    const handleScroll = () => {
-      const container = document.querySelector('.blurring-text-container');
-      if (container && isInViewport(container)) {
-        setInView(true);
-        // Once in view, remove the scroll listener
-        window.removeEventListener('scroll', handleScroll);
-      }
-    };
-    
-    // Check initial state
-    setTimeout(() => {
-      handleScroll();
-    }, 100);
-    
-    // Add scroll event listener
-    window.addEventListener('scroll', handleScroll);
-    
-    // Clean up
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+  useEffect(() => {
+    // Set visible after component mounts to ensure initial blur state is captured
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <main className="blurring-text-container">
       <section className="grid grid-3">
-        <div className={`text-item ${inView ? 'visible' : 'blurred'}`}>CREATOR</div>
-        <div className={`text-item ${inView ? 'visible' : 'blurred'}`}>DESIGNER</div>
-        <div className={`text-item ${inView ? 'visible' : 'blurred'}`}>DEVELOPER</div>
-        <div className={`text-item ${inView ? 'visible' : 'blurred'}`}>ARTIST</div>
+        <div className="text-item">CREATOR</div>
+        <div className="text-item">DESIGNER</div>
+        <div className="text-item">DEVELOPER</div>
+        <div className="text-item">ARTIST</div>
       </section>
       <style jsx>{`
         @import url('https://fonts.googleapis.com/css2?family=Rock+3D&display=swap');
@@ -84,8 +52,37 @@ const BlurringText = () => {
           text-wrap: nowrap;
           transform-style: preserve-3d;
           perspective: 1000px;
-          transition: filter 1s ease, opacity 1s ease, transform 1s ease, text-shadow 1s ease;
+          text-shadow: 
+            0 0 7px #fff,
+            0 0 10px #fff,
+            0 0 21px #3498db,
+            0 0 42px #3498db,
+            0 0 82px #3498db;
+          animation: ${isVisible ? 'blurAnimation 1s forwards' : 'none'};
+          filter: blur(40px);
+          opacity: 0.5;
+          transform: translateZ(-100px);
         }
+        
+        @keyframes blurAnimation {
+          0% {
+            filter: blur(40px);
+            opacity: 0.5;
+            transform: translateZ(-100px);
+          }
+          100% {
+            filter: blur(0);
+            opacity: 1;
+            transform: translateZ(0);
+            text-shadow: 
+              0 0 7px #fff,
+              0 0 10px #fff,
+              0 0 21px #3498db,
+              0 0 42px #3498db,
+              0 0 82px #3498db;
+          }
+        }
+
         .grid-3 div:nth-child(even) {
           text-align: right;
         }
@@ -94,27 +91,6 @@ const BlurringText = () => {
         }
         .grid-3 div:nth-child(4) {
           grid-column: 1 / 7;
-        }
-        
-        /* Blurred state - make sure this is very blurry */
-        .text-item.blurred {
-          filter: blur(40px) !important;
-          opacity: 0.5 !important;
-          transform: translateZ(-100px) !important;
-          text-shadow: none !important;
-        }
-        
-        /* Visible state with transition */
-        .text-item.visible {
-          filter: blur(0) !important;
-          opacity: 1 !important;
-          transform: translateZ(0) !important;
-          text-shadow: 
-            0 0 7px #fff,
-            0 0 10px #fff,
-            0 0 21px #3498db,
-            0 0 42px #3498db,
-            0 0 82px #3498db !important;
         }
         
         @media screen and (max-width: 1023px) {
