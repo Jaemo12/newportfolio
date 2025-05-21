@@ -5,36 +5,60 @@ const BlurringText = () => {
   const containerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    // Force a reflow after component mounts to ensure the animation starts correctly
-    const triggerAnimation = () => {
+    // Function to handle animation once component is mounted
+    const handleAnimation = () => {
       if (containerRef.current) {
         const elements = containerRef.current.querySelectorAll('.autoBLur');
         
-        // Force reflow by accessing offsetHeight
-        elements.forEach(el => {
-          const htmlEl = el as HTMLElement;
-          htmlEl.style.animation = 'none';
-          void htmlEl.offsetHeight; // This triggers reflow
-          htmlEl.style.animation = '';
-        });
-        
-        // Check if elements are in viewport and manually apply animation state
+        // Create an observer to watch for elements in viewport
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
+              // Add class to trigger un-blur animation
               entry.target.classList.add('animate-in-view');
+              
+              // For debugging
+              console.log('Element in view - adding animation class');
             } else {
+              // Remove class when out of view
               entry.target.classList.remove('animate-in-view');
+              
+              // For debugging
+              console.log('Element out of view - removing animation class');
             }
           });
-        }, { threshold: 0.1 });
+        }, { 
+          threshold: 0.1, // Trigger when 10% of element is visible
+          rootMargin: '-10px' // Small negative margin to ensure it's really in view
+        });
         
-        elements.forEach(el => observer.observe(el));
+        // Start observing each element
+        elements.forEach(el => {
+          observer.observe(el);
+          
+          // Immediately check if element is already in viewport on load
+          const rect = el.getBoundingClientRect();
+          const isVisible = 
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+            
+          if (isVisible) {
+            // If already visible on load, add animation class immediately
+            el.classList.add('animate-in-view');
+            console.log('Element visible on load - adding animation class');
+          }
+        });
+        
+        // Clean up observer on unmount
+        return () => observer.disconnect();
       }
     };
     
-    // Small delay to ensure DOM is fully rendered
-    setTimeout(triggerAnimation, 100);
+    // Run animation handler after a small delay to ensure component is fully rendered
+    const timer = setTimeout(handleAnimation, 200);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -94,10 +118,23 @@ const BlurringText = () => {
         .grid-3 div:nth-child(4) {
           grid-column: 1 / 7;
         }
+        .autoBLur {
+          filter: blur(40px);
+          opacity: 0.5;
+          transform: translateZ(-100px);
+          transition: filter 1s ease, opacity 1s ease, transform 1s ease;
+        }
+        
         .autoBLur.animate-in-view {
-          filter: blur(0px);
+          filter: blur(0);
           opacity: 1;
           transform: translateZ(0);
+          text-shadow: 
+            0 0 7px #fff,
+            0 0 10px #fff,
+            0 0 21px #3498db,
+            0 0 42px #3498db,
+            0 0 82px #3498db;
         }
         
         @media screen and (max-width: 1023px) {
