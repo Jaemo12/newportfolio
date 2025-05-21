@@ -7,7 +7,11 @@ const BlurringText = () => {
   
   useEffect(() => {
     // Function to check if element is in viewport
-    const isInViewport = (el) => {
+    interface InViewportElement extends Element {
+      getBoundingClientRect: () => DOMRect;
+    }
+
+    const isInViewport = (el: InViewportElement): boolean => {
       const rect = el.getBoundingClientRect();
       return (
         rect.top >= 0 &&
