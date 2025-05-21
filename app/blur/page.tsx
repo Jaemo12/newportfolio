@@ -1,73 +1,39 @@
 'use client';
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const BlurringText = () => {
-  const containerRef = useRef<HTMLElement | null>(null);
+  // State to track which items are visible
+  const [textItems, setTextItems] = useState({
+    item0: false,
+    item1: false,
+    item2: false,
+    item3: false
+  });
 
+  // Effect to handle animation timing on component mount
   useEffect(() => {
-    // Function to handle animation once component is mounted
-    const handleAnimation = () => {
-      if (containerRef.current) {
-        const elements = containerRef.current.querySelectorAll('.autoBLur');
-        
-        // Create an observer to watch for elements in viewport
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              // Add class to trigger un-blur animation
-              entry.target.classList.add('animate-in-view');
-              
-              // For debugging
-              console.log('Element in view - adding animation class');
-            } else {
-              // Remove class when out of view
-              entry.target.classList.remove('animate-in-view');
-              
-              // For debugging
-              console.log('Element out of view - removing animation class');
-            }
-          });
-        }, { 
-          threshold: 0.1, // Trigger when 10% of element is visible
-          rootMargin: '-10px' // Small negative margin to ensure it's really in view
-        });
-        
-        // Start observing each element
-        elements.forEach(el => {
-          observer.observe(el);
-          
-          // Immediately check if element is already in viewport on load
-          const rect = el.getBoundingClientRect();
-          const isVisible = 
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth);
-            
-          if (isVisible) {
-            // If already visible on load, add animation class immediately
-            el.classList.add('animate-in-view');
-            console.log('Element visible on load - adding animation class');
-          }
-        });
-        
-        // Clean up observer on unmount
-        return () => observer.disconnect();
-      }
-    };
+    // Make each item visible with a staggered delay
+    const timer1 = setTimeout(() => setTextItems(prev => ({ ...prev, item0: true })), 500);
+    const timer2 = setTimeout(() => setTextItems(prev => ({ ...prev, item1: true })), 800);
+    const timer3 = setTimeout(() => setTextItems(prev => ({ ...prev, item2: true })), 1100);
+    const timer4 = setTimeout(() => setTextItems(prev => ({ ...prev, item3: true })), 1400);
     
-    // Run animation handler after a small delay to ensure component is fully rendered
-    const timer = setTimeout(handleAnimation, 200);
-    return () => clearTimeout(timer);
+    // Clean up timers
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      clearTimeout(timer4);
+    };
   }, []);
 
   return (
-    <main className="blurring-text-container" ref={containerRef}>
+    <main className="blurring-text-container">
       <section className="grid grid-3">
-        <div className="autoBLur">CREATOR</div>
-        <div className="autoBLur">DESIGNER</div>
-        <div className="autoBLur">DEVELOPER</div>
-        <div className="autoBLur">ARTIST</div>
+        <div className={`text-item ${textItems.item0 ? 'visible' : 'blurred'}`}>CREATOR</div>
+        <div className={`text-item ${textItems.item1 ? 'visible' : 'blurred'}`}>DESIGNER</div>
+        <div className={`text-item ${textItems.item2 ? 'visible' : 'blurred'}`}>DEVELOPER</div>
+        <div className={`text-item ${textItems.item3 ? 'visible' : 'blurred'}`}>ARTIST</div>
       </section>
       <style jsx>{`
         @import url('https://fonts.googleapis.com/css2?family=Rock+3D&display=swap');
@@ -77,6 +43,8 @@ const BlurringText = () => {
           color: white;
           padding-top: 100px;
           padding-bottom: 100px;
+          z-index: 1;
+          position: relative;
         }
         .grid {
           display: grid;
@@ -96,18 +64,9 @@ const BlurringText = () => {
         .grid-3 div {
           grid-column: 2 / 6;
           text-wrap: nowrap;
-          text-shadow: 
-            0 0 7px #fff,
-            0 0 10px #fff,
-            0 0 21px #3498db,
-            0 0 42px #3498db,
-            0 0 82px #3498db;
           transform-style: preserve-3d;
           perspective: 1000px;
-          filter: blur(40px);
-          opacity: 0.5;
-          transform: translateZ(-100px);
-          transition: filter 0.8s ease, opacity 0.8s ease, transform 0.8s ease;
+          transition: filter 1s ease, opacity 1s ease, transform 1s ease, text-shadow 1s ease;
         }
         .grid-3 div:nth-child(even) {
           text-align: right;
@@ -118,14 +77,16 @@ const BlurringText = () => {
         .grid-3 div:nth-child(4) {
           grid-column: 1 / 7;
         }
-        .autoBLur {
+        
+        /* Blurred state */
+        .text-item.blurred {
           filter: blur(40px);
           opacity: 0.5;
           transform: translateZ(-100px);
-          transition: filter 1s ease, opacity 1s ease, transform 1s ease;
         }
         
-        .autoBLur.animate-in-view {
+        /* Visible state */
+        .text-item.visible {
           filter: blur(0);
           opacity: 1;
           transform: translateZ(0);
