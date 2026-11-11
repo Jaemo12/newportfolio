@@ -66,3 +66,7 @@ Lists are hairline-ruled rows with a heavy 2px rule on top. Buttons are pills: s
 
 - Artwork is served from `public/art/` (about 0.1 to 0.5 MB each); the 14 to 20 MB originals stay in `public/` unreferenced. Keep new photos under about 2000px on the long side.
 - Lottie animations are fetched only when near the viewport; the WebGL scene and particles pause when off-screen.
+
+## Navigation
+
+`app/sections/navbar.tsx` is a floating capsule: script name, links with a highlight that glides to the hovered link (`layoutId`), an orange dot under the current section, a Start a project pill, and Resume on extra-wide screens. It tucks away when scrolling down and returns when scrolling up. On phones the menu opens as a rounded sheet with staggered links.
