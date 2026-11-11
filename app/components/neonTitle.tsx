@@ -4,13 +4,11 @@ import { motion } from 'framer-motion';
 
 const NeonTitle = () => {
   return (
-    <div className="text-center">
+    <div className="text-center" aria-hidden="true">
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cedarville+Cursive&display=swap');
-
         .neon-sign {
-          font-family: 'Cedarville Cursive', cursive;
-          font-weight: 600;
+          font-family: var(--font-script), cursive;
+          font-weight: 400;
           color: #fff;
           opacity: 0;
           animation: turnOn 2s ease-in-out forwards,

@@ -1,55 +1,47 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
-import Navbar from './navbar/page';
-import Hero from './hero/page';
-import AboutSection from './about/page';
-import WorkExperience from './workex/page';
-import Projects from './projects/page';
-import BlurringText from './blur/page';
-import SocialsPage from './social/page';
-import ContactMePage from './contact/page';
-import ArtPortfolio from './art/page';
+import React from 'react';
+import Navbar from './sections/navbar';
+import Hero from './sections/hero';
+import AboutSection from './sections/about';
+import WorkExperience from './sections/workex';
+import Projects from './sections/projects';
+import { AnimeDivider } from './components/animeDivider';
+import { Marquee } from './components/marquee';
+import { Story } from './components/story';
+import { Konami } from './components/konami';
+import { Testimonials } from './components/testimonials';
+import { ScrollProgress } from './components/scrollProgress';
+import SocialsPage from './sections/social';
+import ContactMePage from './sections/contact';
+import ArtPortfolio from './sections/art';
 import Footer from './components/footer';
-import LoadingPage from './LoadingPage/page';
 import { SectionTransition } from './components/sectionTransition';
-import ServicesPage from './services/page';
+import ServicesPage from './sections/services';
 
 const HomePage: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate loading time
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return <LoadingPage />;
-  }
-
   return (
     <>
-      <Head>
-        <title>Amit Samant | Portfolio</title>
-        <meta name="description" content="A showcase of my work and skills" />
-      </Head>
-      <main className="bg-black text-white">
+      <main className="bg-ink text-bone">
+        <ScrollProgress />
+        <Konami />
         <Navbar />
         
         <SectionTransition id="home" effect="zoom">
           <Hero />
         </SectionTransition>
         
-        <BlurringText />
-        
+        <Marquee items={['Quality engineer', 'AI product builder', 'Artist']} />
+        <AnimeDivider character="pikachu" label="Pikachu, an anime favorite" />
+
+        <Story />
+
         <SectionTransition id="about" effect="slide">
           <AboutSection />
         </SectionTransition>
         
+        <AnimeDivider character="spiritedaway" label="Spirited Away, an anime favorite" />
+
         <SectionTransition id="workex" effect="slide">
           <WorkExperience />
         </SectionTransition>
@@ -58,13 +50,20 @@ const HomePage: React.FC = () => {
           <Projects />
         </SectionTransition>
         
+        <Testimonials />
+        <AnimeDivider character="animeGirl" label="An anime girl" />
+
+        <SectionTransition id="art" effect="slide">
           <ArtPortfolio />
+        </SectionTransition>
         
         
         
         <SectionTransition id="services" effect="slide">
           <ServicesPage />
         </SectionTransition>
+        <AnimeDivider character="naruto" label="Naruto, an anime favorite" />
+
         <SectionTransition id="social" effect="slide">
           <SocialsPage />
         </SectionTransition>
