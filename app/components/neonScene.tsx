@@ -9,7 +9,7 @@ const NeonTitle = dynamic(() => import('./neonTitle'), { ssr: false });
  * The hero scene, rendered in one WebGL shader so the sign, the wall it
  * lights and its reflection are the same light:
  *  - the sign is drawn once into a texture (tube core, tight glow, wide glow)
- *  - the brick wall is only visible where the sign lights it
+ *  - the air around the sign gets a soft haze of its light
  *  - the wet floor mirrors the sign about the wall line, smeared vertically
  *    the way wet asphalt does, sharp in puddles and dull where it is drier
  * Flicker is a single number per line, so the wall and the reflection
@@ -56,24 +56,12 @@ void main(){
   vec3 col = vec3(0.0);
 
   if (px.y < uHorizon) {
-    // Brick wall, lit only by the sign.
-    float s = uSign.z / 8.0;
-    vec2 b = px / vec2(s, s * 0.36);
-    b.x += mod(floor(b.y), 2.0) * 0.5;
-    vec2 id = floor(b), f = fract(b);
-    float face = smoothstep(0.0, 0.04, f.x) * smoothstep(1.0, 0.96, f.x) * smoothstep(0.0, 0.11, f.y) * smoothstep(1.0, 0.89, f.y);
-    float tint = 0.6 + 0.4 * hash(id);
-    float rough = 0.7 + 0.6 * fbm(px * 0.22 / uDpr + id * 3.1);
-    vec3 albedo = mix(vec3(0.07, 0.06, 0.058), vec3(0.34, 0.15, 0.11) * tint, face) * rough;
-
+    // Open dark space: just the sign and a little haze in the air around it.
     vec2 q = (px - c) / vec2(uSign.z * 0.62, uSign.w * 0.72);
-    float fall = exp(-dot(q, q) * 1.5);
+    float fall = exp(-dot(q, q) * 1.1);
     vec3 t = tube(px);
-    // the lower edge of each brick catches a little more light from above/below the tube
-    float bevel = 1.0 + 0.5 * (smoothstep(0.75, 0.9, f.y) - smoothstep(0.1, 0.25, 1.0 - f.y)) * sign(c.y - px.y);
-    vec3 light = NEON * (fall * 0.3 * fl + t.b * 0.8) * bevel;
-    col = albedo * light + emit(t);
-    col *= mix(0.45, 1.0, smoothstep(0.0, uSign.w * 0.10, uHorizon - px.y));
+    col = NEON * (fall * 0.11 * fl + t.b * 0.7) + emit(t);
+    col *= mix(0.5, 1.0, smoothstep(0.0, uSign.w * 0.10, uHorizon - px.y));
   } else {
     // Wet asphalt.
     float d = px.y - uHorizon;
@@ -90,15 +78,15 @@ void main(){
     float rip = (fbm(fc * vec2(3.0, 5.0) + vec2(0.0, t0)) - 0.5) * wob * 1.5;
 
     vec3 acc = vec3(0.0);
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < SAMPLES; i++) {
       float fi = float(i);
-      float k = (fi + hash(px + fi * 7.13)) / 14.0 - 0.5;
+      float k = (fi + hash(px + fi * 7.13)) / float(SAMPLES) - 0.5;
       float n = noise(vec2(fc.x * 6.0 + fi * 1.7, fc.y * 6.0 + t0)) - 0.5;
       vec2 sp = vec2(px.x + rip + n * wob, uHorizon - d * 1.03 + k * streak);
       if (sp.y > uHorizon) sp.y = 2.0 * uHorizon - sp.y;
       acc += tube(sp);
     }
-    acc /= 14.0;
+    acc /= float(SAMPLES);
 
     float fres = mix(0.95, 0.22, smoothstep(0.0, 1.0, d / depth));
     float strength = mix(0.20, 0.85, puddle) * fres;
@@ -224,7 +212,9 @@ export const NeonScene = () => {
     try {
       prog = gl.createProgram()!;
       gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
-      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+      const samples = window.innerWidth < 720 ? 7 : 14; // fewer reflection samples on phones
+      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, `#define SAMPLES ${samples}
+${FRAG}`));
       gl.linkProgram(prog);
       if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error('link');
     } catch (e) {
@@ -256,7 +246,7 @@ export const NeonScene = () => {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0]));
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 720 ? 1.25 : 1.5);
     const f1 = makeFlicker(0.35);
     const f2 = makeFlicker(0.85);
     let ready = false;

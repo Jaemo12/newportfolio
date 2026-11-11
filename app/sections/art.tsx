@@ -9,14 +9,14 @@ import Image from 'next/image';
 const showcaseData = [
   {
     id: 1,
-    src: '/artwork1.jpeg',
+    src: '/art/artwork1.jpg',
     title: 'Ink & Quill Echoes',
     category: 'Pen & ink illustration',
     description: 'Delicate lines and intricate details whisper tales from a world born of ink and imagination.',
   },
   {
     id: 2,
-    src: '/artwork2.jpg',
+    src: '/art/artwork2.jpg',
     title: 'Charcoal Dreams',
     category: 'Expressive charcoal study',
     description:
@@ -24,7 +24,7 @@ const showcaseData = [
   },
   {
     id: 3,
-    src: '/artwork3.jpg',
+    src: '/art/artwork3.jpg',
     title: 'Digital Strokes',
     category: 'Concept art & digital painting',
     description:

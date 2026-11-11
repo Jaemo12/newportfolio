@@ -42,9 +42,9 @@ Lists are hairline-ruled rows with a heavy 2px rule on top. Buttons are pills: s
 
 ## Play
 
-- Hero (`app/sections/hero.tsx`, `app/components/neonScene.tsx`): a resume-style layout. Name, one line, two actions and three facts on the left; on the right a WebGL scene drawn in one shader: the neon sign on a brick wall that only shows where the sign lights it, above a wet floor that mirrors the sign (smeared vertically, sharp in puddles, rippling). The wall and the reflection flicker with the tube. On phones the scene is a block above the text. Falls back to the CSS sign if WebGL is missing. CTA buttons pull toward the cursor (`magnetic.tsx`).
+- Hero (`app/sections/hero.tsx`, `neonScene.tsx`, `particles.tsx`): the scene is stacked above the text at every size. The neon sign hangs in open dark space above a wet floor that mirrors it (one WebGL shader; reflection flickers with the tube). Warm dust drifts in the sign's light and reacts to the cursor: it swirls away, leaves a spark trail, lights up and connects with thin threads nearby, and bursts on click or tap. Phones get a lighter shader and fewer particles. Falls back to the CSS sign without WebGL; with reduced motion it draws one still frame. CTA buttons pull toward the cursor (`magnetic.tsx`).
 - Work is a horizontal film strip on wide screens. Each job has a drawn illustration instead of a photo (`scenes.tsx`): a test run ticking green (Cognixia), a growth curve drawing itself (TIMIO), a delivery pipeline with flowing dashes (Cognizant). They lean toward the cursor.
-- Projects: each project has a drawn, animated product illustration instead of screenshots (`projectScenes.tsx`): a journal with mood trend (AI Diary), emotion bars and picks (ReviewFlix), ingredients to recipe (RecipeGenius).
+- Projects: each project has a drawn, animated product illustration (`projectScenes.tsx`). Clicking one morphs the illustration into a full-screen detail view (shared-element `layoutId` transition) with the story, features, stack and links; Esc or the close button reverses it and returns focus.
 - About: a monogram with Ink, Pixels, AI, Testing, React and Next.js orbiting it replaces the stock photo; skills slide and light up on hover; an education timeline draws itself.
 - Section headlines rise out of a mask word by word (`headline.tsx`). Konami code triggers confetti. A progress bar and film grain sit over the page.
 
@@ -61,3 +61,8 @@ Lists are hairline-ruled rows with a heavy 2px rule on top. Buttons are pills: s
 - Add a third typeface or a second accent color.
 - Add gradient text, kickers above headings, section numbers, glass blur, or hard offset shadows.
 - Bring back the fake loader or hidden-until-scroll content.
+
+## Performance notes
+
+- Artwork is served from `public/art/` (about 0.1 to 0.5 MB each); the 14 to 20 MB originals stay in `public/` unreferenced. Keep new photos under about 2000px on the long side.
+- Lottie animations are fetched only when near the viewport; the WebGL scene and particles pause when off-screen.

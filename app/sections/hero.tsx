@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowDown, FileText } from 'lucide-react';
 import { Magnetic } from '../components/magnetic';
 import { NeonScene } from '../components/neonScene';
+import { Particles } from '../components/particles';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -24,9 +25,10 @@ const PremiumHeroSection = () => {
   const reduce = useReducedMotion();
   return (
     <section className="relative overflow-hidden">
-      {/* The scene: sign on a brick wall above a wet floor, on top at every size. */}
+      {/* The scene: the sign in open dark space above a wet floor, with particles that react to the cursor. */}
       <div className="relative h-[62svh] min-h-[28rem] w-full [mask-image:linear-gradient(to_bottom,#000_74%,transparent)] lg:h-[68svh]">
         <NeonScene />
+        <Particles />
       </div>
 
       <div className="relative z-10 mx-auto -mt-10 max-w-6xl px-6 pb-20 sm:px-8">

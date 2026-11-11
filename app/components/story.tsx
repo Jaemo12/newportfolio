@@ -40,7 +40,7 @@ const acts: Act[] = [
     label: 'Art',
     title: "I draw things that don't exist yet.",
     body: 'Ink, charcoal and digital paint. The same obsession with detail, on paper and on screen.',
-    image: '/artwork2.jpg',
+    image: '/art/artwork2.jpg',
     alt: 'Charcoal artwork by Amit Samant',
     field: 'bg-bone text-ink',
     frame: 'border-ink/20',
