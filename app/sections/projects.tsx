@@ -2,8 +2,9 @@
 
 import { Headline } from '../components/headline';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
-import { ArrowUpRight, ExternalLink, Github, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowUpRight, ExternalLink, X } from 'lucide-react';
+import { Github } from '../components/brandIcons';
 import { Tilt } from '../components/scenes';
 import { JournalScene, RecipeScene, ReviewScene } from '../components/projectScenes';
 
@@ -87,7 +88,7 @@ const ProjectsShowcase = () => {
   const p = open === null ? null : projects[open];
 
   return (
-    <LayoutGroup>
+    <>
       <div className="mx-auto max-w-6xl px-6 py-24 sm:px-8 md:py-36">
         <Headline>{'Every project started with a conversation'}</Headline>
 
@@ -164,7 +165,6 @@ const ProjectsShowcase = () => {
                 aria-label="Close project"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1, transition: { delay: 0.25, type: 'spring', stiffness: 300, damping: 20 } }}
-                exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.15 } }}
                 className="fixed right-5 top-5 z-10 inline-flex h-12 w-12 items-center justify-center rounded-full bg-bone text-ink transition-colors hover:bg-signal"
               >
                 <X size={22} />
@@ -184,7 +184,6 @@ const ProjectsShowcase = () => {
                   className="lg:col-span-5"
                   initial="hidden"
                   animate="show"
-                  exit="hidden"
                   variants={{ show: { transition: { staggerChildren: 0.07, delayChildren: 0.2 } }, hidden: {} }}
                 >
                   {[
@@ -249,7 +248,7 @@ const ProjectsShowcase = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </LayoutGroup>
+    </>
   );
 };
 

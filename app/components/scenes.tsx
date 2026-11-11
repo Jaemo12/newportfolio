@@ -49,14 +49,11 @@ export const TestRunScene = () => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { margin: '-10%' });
   const reduce = useReducedMotion();
-  const [n, setN] = useState(0);
+  const [step, setN] = useState(0);
+  const n = reduce ? tests.length + 2 : step;
 
   useEffect(() => {
-    if (reduce) {
-      setN(tests.length + 2);
-      return;
-    }
-    if (!inView) return;
+    if (reduce || !inView) return;
     const id = setInterval(() => setN((v) => (v >= tests.length + 3 ? 0 : v + 1)), 600);
     return () => clearInterval(id);
   }, [inView, reduce]);

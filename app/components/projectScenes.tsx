@@ -12,15 +12,12 @@ const useCycle = (max: number, hold: number, ms: number) => {
   const reduce = useReducedMotion();
   const [n, setN] = useState(0);
   useEffect(() => {
-    if (reduce) {
-      setN(max + hold);
-      return;
-    }
-    if (!inView) return;
+    if (reduce || !inView) return;
     const id = setInterval(() => setN((v) => (v >= max + hold ? 0 : v + 1)), ms);
     return () => clearInterval(id);
   }, [inView, reduce, max, hold, ms]);
-  return { ref, n, inView, reduce };
+  // With reduced motion the scene simply shows its finished state.
+  return { ref, n: reduce ? max + hold : n, inView, reduce };
 };
 
 const moods = ['Calm', 'Anxious', 'Hopeful'];

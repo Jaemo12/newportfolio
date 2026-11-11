@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Github, Linkedin } from 'lucide-react';
+import { Github, Linkedin } from '../components/brandIcons';
 import { Headline } from '../components/headline';
 
 const ease = [0.16, 1, 0.3, 1] as const;

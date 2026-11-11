@@ -3,7 +3,7 @@
 import { Headline } from '../components/headline';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Instagram } from 'lucide-react';
+import { Instagram } from '../components/brandIcons';
 import Image from 'next/image';
 
 const showcaseData = [
