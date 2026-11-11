@@ -23,14 +23,14 @@ const rise = (delay: number) => ({
 const PremiumHeroSection = () => {
   const reduce = useReducedMotion();
   return (
-    <section className="relative overflow-hidden lg:min-h-screen">
-      {/* The scene: sign on a brick wall above a wet floor. Top block on phones, right side on wide screens. */}
-      <div className="relative h-[60svh] w-full [mask-image:linear-gradient(to_bottom,#000_72%,transparent)] lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-[60%] lg:[mask-image:linear-gradient(to_right,transparent,#000_30%)]">
+    <section className="relative overflow-hidden">
+      {/* The scene: sign on a brick wall above a wet floor, on top at every size. */}
+      <div className="relative h-[62svh] min-h-[28rem] w-full [mask-image:linear-gradient(to_bottom,#000_74%,transparent)] lg:h-[68svh]">
         <NeonScene />
       </div>
 
-      <div className="relative z-10 mx-auto -mt-8 flex max-w-7xl flex-col justify-center px-6 pb-20 sm:px-8 lg:mt-0 lg:min-h-screen lg:pb-16 lg:pt-28">
-        <div className="lg:max-w-[42%]">
+      <div className="relative z-10 mx-auto -mt-10 max-w-6xl px-6 pb-20 sm:px-8">
+        <div>
           <h1 className="display" aria-label="Amit Samant">
             {['Amit', 'Samant'].map((w, i) => (
               <span key={w} aria-hidden className="inline-block overflow-hidden pb-[0.1em] align-bottom">
@@ -76,10 +76,10 @@ const PremiumHeroSection = () => {
             </Magnetic>
           </motion.div>
 
-          <motion.dl {...rise(0.7)} className="mt-12 border-t border-bone/20">
+          <motion.dl {...rise(0.7)} className="mt-12 grid border-t border-bone/20 md:grid-cols-3 md:gap-x-10">
             {facts.map((f) => (
-              <div key={f.label} className="flex items-baseline gap-6 border-b border-bone/20 py-3.5">
-                <dt className="w-24 shrink-0 text-sm text-paper-dim">{f.label}</dt>
+              <div key={f.label} className="flex items-baseline gap-6 border-b border-bone/20 py-3.5 md:block md:space-y-1">
+                <dt className="w-24 shrink-0 text-sm text-paper-dim md:w-auto">{f.label}</dt>
                 <dd className="text-base font-medium text-bone">{f.value}</dd>
               </div>
             ))}
