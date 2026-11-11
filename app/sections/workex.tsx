@@ -87,9 +87,10 @@ export default function WorkExperienceSection() {
           className="mt-12 flex flex-col gap-0 px-6 sm:px-8 lg:mt-10 lg:w-max lg:flex-row lg:gap-8 lg:px-[max(2rem,calc((100vw-72rem)/2+2rem))]"
         >
           {workExperienceData.map((exp) => (
+            <React.Fragment key={exp.id}>
+            <div aria-hidden className="h-0.5 w-full bg-bone lg:hidden" />
             <article
-              key={exp.id}
-              className="group grid gap-6 border-t-2 border-bone py-10 transition-colors duration-300 lg:w-[72vw] lg:max-w-[64rem] lg:shrink-0 lg:grid-cols-12 lg:gap-8 lg:rounded-2xl lg:border lg:border-t lg:border-bone/25 lg:bg-ink-2 lg:p-10 lg:hover:border-signal"
+              className="group grid gap-6 py-10 transition-colors duration-300 lg:w-[72vw] lg:max-w-[64rem] lg:shrink-0 lg:grid-cols-12 lg:gap-8 lg:rounded-2xl lg:border lg:border-bone/25 lg:bg-ink-2 lg:p-10 lg:hover:border-signal"
             >
               <div className="lg:col-span-5">
                 <p className="font-mono text-sm tabular-nums text-signal">{exp.period}</p>
@@ -123,6 +124,7 @@ export default function WorkExperienceSection() {
                 </Tilt>
               </div>
             </article>
+            </React.Fragment>
           ))}
         </motion.div>
 
