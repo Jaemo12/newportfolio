@@ -26,7 +26,7 @@ const PremiumHeroSection = () => {
   return (
     <section className="relative overflow-hidden">
       {/* The scene: the sign in open dark space above a wet floor, with particles that react to the cursor. */}
-      <div className="relative h-[62svh] min-h-[28rem] w-full [mask-image:linear-gradient(to_bottom,#000_74%,transparent)] lg:h-[68svh]">
+      <div className="relative h-[62svh] min-h-[28rem] w-full [mask-image:radial-gradient(ellipse_78%_88%_at_50%_42%,#000_52%,transparent_100%)] lg:h-[68svh]">
         <NeonScene />
         <Particles />
       </div>

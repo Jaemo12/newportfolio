@@ -60,8 +60,8 @@ void main(){
     vec2 q = (px - c) / vec2(uSign.z * 0.62, uSign.w * 0.72);
     float fall = exp(-dot(q, q) * 1.1);
     vec3 t = tube(px);
-    col = NEON * (fall * 0.11 * fl + t.b * 0.7) + emit(t);
-    col *= mix(0.5, 1.0, smoothstep(0.0, uSign.w * 0.10, uHorizon - px.y));
+    col = NEON * (fall * 0.06 * fl + t.b * 0.7) + emit(t);
+    col *= mix(0.8, 1.0, smoothstep(0.0, uSign.w * 0.18, uHorizon - px.y));
   } else {
     // Wet asphalt.
     float d = px.y - uHorizon;
@@ -104,9 +104,13 @@ void main(){
     col += refl * (0.75 + 0.5 * grain * (1.0 - puddle));
     // wet grit catching the light
     col += refl * pow(noise(fc * 55.0), 10.0) * 7.0 * (1.0 - puddle);
-    col *= mix(0.4, 1.0, smoothstep(0.0, uSign.w * 0.05, d));
+    col *= mix(0.75, 1.0, smoothstep(0.0, uSign.w * 0.12, d));
   }
 
+  // dissolve every edge into the page colour so the scene has no visible box
+  vec2 uvp = px / uRes;
+  float edge = smoothstep(0.0, 0.24, uvp.x) * smoothstep(1.0, 0.76, uvp.x) * smoothstep(0.0, 0.10, uvp.y) * smoothstep(1.0, 0.55, uvp.y);
+  col *= edge;
   col = 1.0 - exp(-col * 1.5);
   col = pow(col, vec3(1.0 / 1.55));
   col += (hash(px + uTime) - 0.5) / 255.0;
@@ -142,6 +146,15 @@ const drawSign = async (): Promise<HTMLCanvasElement> => {
     ['Repeat', size * 0.8, 0.8],
   ];
   x.globalCompositeOperation = 'lighter';
+  const sparkle = (cx: number, cy: number, r: number) => {
+    x.beginPath();
+    x.moveTo(cx, cy - r);
+    x.quadraticCurveTo(cx, cy, cx + r, cy);
+    x.quadraticCurveTo(cx, cy, cx, cy + r);
+    x.quadraticCurveTo(cx, cy, cx - r, cy);
+    x.quadraticCurveTo(cx, cy, cx, cy - r);
+    x.stroke();
+  };
   const pass = (color: string, blur: number, stroke: number, times: number) => {
     for (let n = 0; n < times; n++) {
       for (const [text, s, y] of lines) {
@@ -154,6 +167,13 @@ const drawSign = async (): Promise<HTMLCanvasElement> => {
         x.fillText(text, TEX_W / 2, TEX_H * y);
         x.strokeText(text, TEX_W / 2, TEX_H * y);
       }
+      // a neon swoosh under "Repeat" and two small sparkles
+      x.beginPath();
+      x.moveTo(TEX_W * 0.37, TEX_H * 0.925);
+      x.quadraticCurveTo(TEX_W * 0.5, TEX_H * 0.985, TEX_W * 0.63, TEX_H * 0.915);
+      x.stroke();
+      sparkle(TEX_W * 0.865, TEX_H * 0.14, size * 0.17);
+      sparkle(TEX_W * 0.77, TEX_H * 0.69, size * 0.09);
     }
   };
   pass('#ff0000', 0, size * 0.014, 1); // tube core
@@ -269,7 +289,8 @@ ${FRAG}`));
       gl.uniform1f(uTime, reduce ? 0 : t);
       gl.uniform4f(uSign, (W - swFit) / 2, hy - sh, swFit, sh);
       gl.uniform1f(uHorizon, hy);
-      gl.uniform2f(uFlick, reduce ? 1 : f1(t), reduce ? 1 : f2(t));
+      const breath = reduce ? 1 : 1 + 0.035 * Math.sin(t * 1.15);
+      gl.uniform2f(uFlick, reduce ? 1 : f1(t) * breath, reduce ? 1 : f2(t) * breath);
       gl.uniform1f(uDpr, dpr);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
